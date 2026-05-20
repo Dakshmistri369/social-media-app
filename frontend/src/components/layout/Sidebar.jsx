@@ -1,0 +1,93 @@
+import { NavLink, useNavigate } from 'react-router-dom';
+import {
+  RiHome5Line, RiHome5Fill, RiCompassLine, RiCompassFill,
+  RiBellLine, RiBellFill, RiBookmarkLine, RiBookmarkFill,
+  RiUser3Line, RiUser3Fill, RiLogoutBoxLine, RiFlashlightFill,
+} from 'react-icons/ri';
+import useAuthStore from '../../store/authStore';
+import './Sidebar.css';
+
+const navItems = [
+  { to: '/', icon: <RiHome5Line />, activeIcon: <RiHome5Fill />, label: 'Home' },
+  { to: '/explore', icon: <RiCompassLine />, activeIcon: <RiCompassFill />, label: 'Explore' },
+  { to: '/notifications', icon: <RiBellLine />, activeIcon: <RiBellFill />, label: 'Notifications' },
+  { to: '/saved', icon: <RiBookmarkLine />, activeIcon: <RiBookmarkFill />, label: 'Saved' },
+];
+
+export default function Sidebar() {
+  const { user, logout } = useAuthStore();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  return (
+    <aside className="sidebar">
+      {/* Logo */}
+      <div className="sidebar-logo">
+        <div className="logo-icon">
+          <RiFlashlightFill />
+        </div>
+        <span className="logo-text">SocialSphere</span>
+      </div>
+
+      {/* Nav */}
+      <nav className="sidebar-nav">
+        {navItems.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            end={item.to === '/'}
+            className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+          >
+            {({ isActive }) => (
+              <>
+                <span className="sidebar-link-icon">{isActive ? item.activeIcon : item.icon}</span>
+                <span className="sidebar-link-label">{item.label}</span>
+                {isActive && <div className="active-pill" />}
+              </>
+            )}
+          </NavLink>
+        ))}
+
+        {user && (
+          <NavLink
+            to={`/profile/${user.username}`}
+            className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+          >
+            {({ isActive }) => (
+              <>
+                <span className="sidebar-link-icon">{isActive ? <RiUser3Fill /> : <RiUser3Line />}</span>
+                <span className="sidebar-link-label">Profile</span>
+              </>
+            )}
+          </NavLink>
+        )}
+      </nav>
+
+      {/* User card */}
+      {user && (
+        <div className="sidebar-user">
+          <div className="sidebar-user-info">
+            {user.avatar ? (
+              <img src={user.avatar} alt={user.name} className="avatar avatar-md" />
+            ) : (
+              <div className="avatar-placeholder avatar-md">
+                {user.name?.charAt(0).toUpperCase()}
+              </div>
+            )}
+            <div className="sidebar-user-text">
+              <span className="sidebar-user-name">{user.name}</span>
+              <span className="sidebar-user-handle">@{user.username}</span>
+            </div>
+          </div>
+          <button className="btn-icon sidebar-logout" onClick={handleLogout} title="Logout">
+            <RiLogoutBoxLine />
+          </button>
+        </div>
+      )}
+    </aside>
+  );
+}

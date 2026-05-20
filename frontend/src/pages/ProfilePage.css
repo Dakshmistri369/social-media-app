@@ -1,0 +1,176 @@
+/* ══════════════════════════════════════
+   PROFILE PAGE — Dark Glass UI
+══════════════════════════════════════ */
+.profile-page {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.profile-container { display: flex; flex-direction: column; gap: 16px; }
+
+.profile-header {
+  overflow: hidden;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: var(--blur-md);
+  -webkit-backdrop-filter: var(--blur-md);
+  box-shadow: var(--shadow-card);
+}
+
+.profile-cover {
+  height: 180px;
+  overflow: hidden;
+  background: var(--bg-hover);
+  position: relative;
+}
+.cover-img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Violet-to-indigo banner gradient */
+.cover-gradient {
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, #0f0a2a 0%, #1e1060 30%, #7C5CFF 70%, #b47cff 100%);
+  opacity: 0.75;
+}
+
+/* Frosted overlay on cover */
+.profile-cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 50%, rgba(10,10,10,0.6) 100%);
+}
+
+.profile-info { padding: 0 20px 20px; }
+
+.profile-avatar-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: -40px;
+  margin-bottom: 12px;
+}
+
+.profile-avatar-wrap { position: relative; }
+
+.profile-avatar {
+  border: 3px solid var(--bg-primary) !important;
+  box-shadow: 0 0 0 2px var(--accent), 0 0 20px var(--accent-glow);
+}
+
+.profile-actions { display: flex; gap: 8px; align-items: center; }
+
+.profile-meta { display: flex; flex-direction: column; gap: 8px; }
+
+.profile-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.profile-name     { font-size: 22px; font-weight: 800; }
+.profile-username { color: var(--text-muted); font-size: 14px; }
+.profile-bio      { font-size: 15px; color: var(--text-secondary); line-height: 1.5; }
+
+.profile-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.profile-details span,
+.profile-details a {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.profile-website { color: var(--accent-light); text-decoration: none; }
+.profile-website:hover { text-decoration: underline; }
+
+.profile-stats {
+  display: flex;
+  gap: 24px;
+  margin-top: 4px;
+}
+.profile-stat {
+  display: flex;
+  gap: 4px;
+  font-size: 14px;
+  align-items: center;
+  color: var(--text-muted);
+}
+.profile-stat strong { color: var(--text-primary); font-weight: 700; }
+
+/* Frosted Tabs */
+.profile-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: var(--blur-sm);
+  -webkit-backdrop-filter: var(--blur-sm);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: 0 16px;
+}
+
+.profile-tab {
+  padding: 14px 20px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.22s;
+  font-family: inherit;
+}
+.profile-tab:hover { color: var(--text-primary); }
+.profile-tab.active {
+  color: var(--accent-light);
+  border-bottom-color: var(--accent);
+  text-shadow: 0 0 20px rgba(124,92,255,0.4);
+}
+
+.profile-posts-list { display: flex; flex-direction: column; gap: 16px; }
+
+/* Media grid */
+.media-posts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+}
+
+.media-thumb {
+  aspect-ratio: 1;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  background: var(--bg-hover);
+  border-radius: 2px;
+}
+.media-thumb:hover { opacity: 0.80; }
+.media-thumb-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s;
+}
+.media-thumb:hover .media-thumb-img { transform: scale(1.06); }
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 0;
+  font-family: inherit;
+  transition: color 0.2s;
+}
+.back-btn:hover { color: var(--text-primary); }

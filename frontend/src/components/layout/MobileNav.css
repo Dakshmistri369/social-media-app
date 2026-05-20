@@ -1,0 +1,33 @@
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  padding: 10px 0;
+  z-index: 200;
+  justify-content: space-around;
+}
+
+.mobile-nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: var(--text-muted);
+  padding: 8px 20px;
+  border-radius: var(--radius-md);
+  transition: all 0.2s;
+}
+
+.mobile-nav-item.active {
+  color: var(--accent-light);
+}
+
+@media (max-width: 768px) {
+  .mobile-nav { display: flex !important; }
+}

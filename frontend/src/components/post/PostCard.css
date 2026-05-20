@@ -1,0 +1,194 @@
+/* ══════════════════════════════════════
+   POST CARD — Floating Glass Card
+   Dark Glass UI
+══════════════════════════════════════ */
+.post-card {
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  overflow: hidden;
+  backdrop-filter: var(--blur-md);
+  -webkit-backdrop-filter: var(--blur-md);
+  box-shadow: var(--shadow-card);
+}
+
+.post-card:hover {
+  border-color: rgba(124, 92, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 40px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    0 0 24px rgba(124,92,255,0.10);
+}
+
+.post-card-inner {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.repost-banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 12px;
+  color: var(--text-muted);
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--border);
+}
+
+/* Author */
+.post-author {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.post-author-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.post-author-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.post-author-name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.post-author-handle {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Content */
+.post-content {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.content-hashtag {
+  color: var(--accent-light);
+  font-weight: 500;
+  cursor: pointer;
+}
+.content-hashtag:hover { text-decoration: underline; }
+
+.content-mention {
+  color: var(--blue-light);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Hashtags */
+.post-hashtags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Menu */
+.post-menu-wrapper { position: relative; }
+
+.post-menu-btn {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.post-card:hover .post-menu-btn { opacity: 1; }
+
+.post-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  background: rgba(15,15,15,0.95);
+  backdrop-filter: var(--blur-lg);
+  -webkit-backdrop-filter: var(--blur-lg);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 6px;
+  min-width: 165px;
+  z-index: 50;
+  box-shadow: var(--shadow-lg), 0 0 24px rgba(0,0,0,0.6);
+  animation: scaleIn 0.15s ease;
+}
+
+.post-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.post-menu-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+.post-menu-item.danger:hover {
+  background: rgba(239,68,68,0.10);
+  color: var(--red);
+}
+
+/* Actions bar */
+.post-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.post-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: var(--radius-full);
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+.post-action-btn span { font-size: 13px; font-weight: 500; }
+
+.like-btn:hover    { background: rgba(239,68,68,0.10);    color: var(--red); }
+.like-btn.liked    { color: var(--red); }
+.like-btn.liked svg { filter: drop-shadow(0 0 6px rgba(239,68,68,0.5)); }
+
+.comment-btn:hover { background: rgba(59,130,246,0.10);  color: var(--blue-light); }
+
+.repost-btn:hover  { background: rgba(16,185,129,0.10);  color: var(--green); }
+.repost-btn.reposted { color: var(--green); }
+
+.share-btn:hover   { background: rgba(124,92,255,0.12);  color: var(--accent-light); }
+
+.save-btn { margin-left: auto; }
+.save-btn:hover  { background: rgba(124,92,255,0.12);  color: var(--accent-light); }
+.save-btn.saved  { color: var(--accent-light); }

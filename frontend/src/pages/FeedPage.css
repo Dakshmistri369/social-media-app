@@ -1,0 +1,17 @@
+.posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.loading-posts { display: flex; flex-direction: column; gap: 16px; }
+
+.feed-end {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 24px;
+}
+
+.post-skeleton { overflow: hidden; }

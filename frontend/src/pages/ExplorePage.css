@@ -1,0 +1,164 @@
+/* ══════════════════════════════════════
+   EXPLORE PAGE — Dark Glass UI
+══════════════════════════════════════ */
+.explore-layout {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.explore-column { display: flex; flex-direction: column; gap: 20px; }
+
+.explore-search-wrap { position: sticky; top: 0; z-index: 10; padding: 8px 0; }
+
+/* Frosted search bar */
+.explore-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: var(--blur-lg);
+  -webkit-backdrop-filter: var(--blur-lg);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-full);
+  padding: 12px 18px;
+  transition: all 0.22s;
+  box-shadow: var(--shadow-sm);
+}
+.explore-search:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(124,92,255,0.14), 0 0 24px rgba(124,92,255,0.10);
+  background: rgba(255,255,255,0.07);
+}
+
+.search-icon { color: var(--text-muted); font-size: 18px; flex-shrink: 0; }
+
+.search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 15px;
+}
+.search-input::placeholder { color: var(--text-muted); }
+
+/* Trending tags panel */
+.trending-tags {
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  backdrop-filter: var(--blur-md);
+  -webkit-backdrop-filter: var(--blur-md);
+  box-shadow: var(--shadow-card);
+}
+
+.trending-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--orange);
+  margin-bottom: 12px;
+}
+
+.trend-icon { font-size: 18px; }
+
+.tags-scroll {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.active-tag {
+  background: var(--accent-gradient) !important;
+  color: white !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 14px var(--accent-glow) !important;
+}
+
+/* Explore grid */
+.explore-grid { columns: 2; gap: 12px; }
+@media (max-width: 600px) { .explore-grid { columns: 1; } }
+
+.explore-media-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  break-inside: avoid;
+  margin-bottom: 12px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  backdrop-filter: var(--blur-sm);
+  transition: border-color 0.22s, box-shadow 0.22s;
+}
+.explore-media-card:hover {
+  border-color: rgba(124,92,255,0.30);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 20px rgba(124,92,255,0.12);
+}
+
+.explore-media {
+  width: 100%;
+  display: block;
+  transition: transform 0.3s;
+}
+.explore-media-card:hover .explore-media { transform: scale(1.04); }
+
+.explore-media-overlay {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 24px 12px 10px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.80));
+  display: flex;
+  gap: 12px;
+  font-size: 13px;
+  color: white;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.2s;
+  backdrop-filter: var(--blur-sm);
+}
+.explore-media-card:hover .explore-media-overlay { opacity: 1; }
+
+.explore-text-post { break-inside: avoid; margin-bottom: 12px; }
+
+/* Search results */
+.search-results { display: flex; flex-direction: column; gap: 20px; }
+.search-section { display: flex; flex-direction: column; gap: 10px; }
+.search-section-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+
+.user-search-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  backdrop-filter: var(--blur-md);
+  -webkit-backdrop-filter: var(--blur-md);
+  box-shadow: var(--shadow-card);
+  transition: all 0.22s;
+}
+.user-search-card:hover {
+  border-color: rgba(124,92,255,0.28);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-card), 0 0 18px rgba(124,92,255,0.10);
+}
+
+.user-search-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.user-search-info strong { font-size: 14px; color: var(--text-primary); }
+.user-search-info span  { font-size: 12px; color: var(--text-muted); }
+.user-search-info p     { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+.user-follower-count { font-size: 12px; color: var(--text-muted); white-space: nowrap; }

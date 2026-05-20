@@ -1,0 +1,75 @@
+.post-detail-page {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  width: 100%;
+}
+
+.post-detail-container { display: flex; flex-direction: column; gap: 16px; }
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 0;
+  font-family: inherit;
+  transition: color 0.2s;
+}
+.back-btn:hover { color: var(--text-primary); }
+
+/* Glass detail card */
+.post-detail-card {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  backdrop-filter: var(--blur-lg);
+  -webkit-backdrop-filter: var(--blur-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.post-detail-header { display: flex; align-items: center; justify-content: space-between; }
+.post-author { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.post-author:hover .post-author-name { color: var(--accent-light); }
+.post-author-name { display: flex; align-items: center; gap: 4px; font-size: 16px; font-weight: 700; }
+.post-author-handle { font-size: 13px; color: var(--text-muted); }
+
+.post-detail-content {
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.post-detail-stats {
+  display: flex;
+  gap: 20px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.post-detail-stats strong { color: var(--text-primary); }
+
+.post-detail-actions {
+  display: flex;
+  gap: 4px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.post-detail-comments { display: flex; flex-direction: column; gap: 16px; padding-top: 8px; }
+
+.comments-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+

@@ -1,0 +1,100 @@
+/* ══════════════════════════════════════
+   NOTIFICATIONS PAGE — Dark Glass UI
+══════════════════════════════════════ */
+.notif-page {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.notif-container { display: flex; flex-direction: column; gap: 16px; }
+
+.notif-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.notif-header div { display: flex; align-items: center; gap: 10px; }
+.notif-title { font-size: 22px; font-weight: 800; }
+
+.notif-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.22s;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  position: relative;
+  backdrop-filter: var(--blur-md);
+  -webkit-backdrop-filter: var(--blur-md);
+  box-shadow: var(--shadow-card);
+}
+.notif-item:hover {
+  border-color: rgba(124,92,255,0.25);
+  transform: translateX(4px);
+  box-shadow: var(--shadow-card), 0 0 18px rgba(124,92,255,0.08);
+}
+
+/* Unread — violet glass highlight */
+.notif-item.unread {
+  background: rgba(124, 92, 255, 0.07);
+  border-color: rgba(124, 92, 255, 0.22);
+}
+
+.notif-icon-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.notif-type-icon {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  width: 20px; height: 20px;
+  background: rgba(15,15,15,0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  border: 2px solid var(--bg-primary);
+  backdrop-filter: var(--blur-sm);
+}
+
+.notif-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.notif-content p { font-size: 14px; color: var(--text-primary); line-height: 1.4; }
+.notif-content strong { font-weight: 700; }
+
+.notif-post-preview {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.notif-time { font-size: 12px; color: var(--text-muted); }
+
+.unread-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  margin-top: 6px;
+  box-shadow: 0 0 8px var(--accent-glow);
+}
