@@ -1,8 +1,16 @@
 import axios from 'axios';
 
+// In production (Vercel), VITE_API_URL must be set in the Vercel dashboard.
+// Fallback covers local dev. Production fallback points to deployed backend.
+const PROD_API = 'https://social-media-app-t73o.vercel.app/api';
+const DEV_API  = 'http://localhost:5000/api';
+
+const BASE_URL = import.meta.env.VITE_API_URL
+  || (import.meta.env.DEV ? DEV_API : PROD_API);
+
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
-  withCredentials: true,
+  baseURL: BASE_URL,
+  withCredentials: false, // using Bearer tokens, not cookies — no need for credentials
 });
 
 API.interceptors.request.use((config) => {

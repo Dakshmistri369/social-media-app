@@ -19,22 +19,46 @@ const path = require('path');
 const maskedUri = (process.env.MONGO_URI || '').replace(/:([^@]+)@/, ':****@');
 console.log('🔑 MONGO_URI loaded:', maskedUri || 'NOT SET!');
 
+// ── Allowed origins (dev + production) ──────────────────────────────────────
+const ALLOWED_ORIGINS = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://social-media-app-uq3l.vercel.app',
+  // also accept any vercel preview URL for this project
+];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // allow requests with no origin (curl, mobile apps, Postman)
+    if (!origin) return callback(null, true);
+    if (
+      ALLOWED_ORIGINS.includes(origin) ||
+      /^https:\/\/social-media-app-uq3l.*\.vercel\.app$/.test(origin)
+    ) {
+      return callback(null, true);
+    }
+    return callback(new Error(`CORS: origin ${origin} not allowed`));
+  },
+  credentials: false,           // using Bearer tokens — no cookies needed
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
 const app = express();
 const server = http.createServer(app);
+
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: ALLOWED_ORIGINS,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true,
+    credentials: false,
   },
 });
 
-// Middleware
+// ── Middleware ───────────────────────────────────────────────────────────────
 app.use(helmet({ crossOriginResourcePolicy: false }));
-app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
-  credentials: true,
-}));
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // handle preflight for all routes
 app.use(morgan('dev'));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -47,7 +71,7 @@ app.use(fileUpload({
 }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Socket.io
+// ── Socket.io ────────────────────────────────────────────────────────────────
 const onlineUsers = new Map();
 
 io.on('connection', (socket) => {
@@ -83,7 +107,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes
+// ── Routes ───────────────────────────────────────────────────────────────────
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/posts', require('./routes/posts'));
@@ -93,7 +117,12 @@ app.use('/api/upload', require('./routes/upload'));
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'SocialSphere API Running' });
+  res.json({
+    status: 'OK',
+    message: 'SocialSphere API Running',
+    db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    env: process.env.NODE_ENV,
+  });
 });
 
 // Error handler
@@ -107,47 +136,54 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Connect DB and start server
-const PORT = process.env.PORT || 5000;
+// ── DB Connection (cached for Vercel serverless cold-starts) ─────────────────
+let isConnected = false;
 
-const connectWithRetry = async (retries = 5, delay = 3000) => {
-  for (let attempt = 1; attempt <= retries; attempt++) {
-    try {
-      console.log(`🔄 Connecting to MongoDB... (attempt ${attempt}/${retries})`);
-      await mongoose.connect(process.env.MONGO_URI, {
-        serverSelectionTimeoutMS: 10000,
-        connectTimeoutMS: 10000,
-      });
-      console.log('✅ MongoDB Connected');
+const connectDB = async () => {
+  if (isConnected && mongoose.connection.readyState === 1) return;
 
-      server.listen(PORT, () => {
-        console.log(`🚀 Server running on http://localhost:${PORT}`);
-      });
-
-      server.on('error', (err) => {
-        if (err.code === 'EADDRINUSE') {
-          console.error(`❌ Port ${PORT} is already in use.`);
-          console.error(`   Run this to fix: npx kill-port ${PORT}`);
-          process.exit(1);
-        } else {
-          throw err;
-        }
-      });
-
-      return; // success — exit the loop
-    } catch (err) {
-      console.error(`❌ MongoDB attempt ${attempt} failed: ${err.message}`);
-      if (attempt < retries) {
-        console.log(`⏳ Retrying in ${delay / 1000}s... (Is your Atlas cluster active?)`);
-        await new Promise((res) => setTimeout(res, delay));
-      } else {
-        console.error('💀 All connection attempts failed. Exiting.');
-        console.error('👉 Check: cloud.mongodb.com → Resume your cluster if paused');
-        console.error('👉 Check: Network Access → Allow 0.0.0.0/0');
-        process.exit(1);
-      }
-    }
+  try {
+    console.log('🔄 Connecting to MongoDB...');
+    await mongoose.connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 10000,
+      connectTimeoutMS: 10000,
+    });
+    isConnected = true;
+    console.log('✅ MongoDB Connected');
+  } catch (err) {
+    console.error('❌ MongoDB connection failed:', err.message);
+    // Don't call process.exit(1) — that kills the Vercel serverless function.
+    // Let the individual route handlers return 500 errors instead.
+    isConnected = false;
   }
 };
 
-connectWithRetry();
+// Ensure DB is connected on every request (no-op when already connected)
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
+
+// ── Start server (local dev only — Vercel uses the exported app) ─────────────
+const PORT = process.env.PORT || 5000;
+
+if (process.env.NODE_ENV !== 'production') {
+  connectDB().then(() => {
+    server.listen(PORT, () => {
+      console.log(`🚀 Server running on http://localhost:${PORT}`);
+    });
+    server.on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        console.error(`❌ Port ${PORT} is in use. Run: npx kill-port ${PORT}`);
+        process.exit(1);
+      } else {
+        throw err;
+      }
+    });
+  });
+} else {
+  // In production (Vercel), just connect on startup
+  connectDB();
+}
+
+module.exports = app;
