@@ -15,6 +15,13 @@ export default function MobileNav() {
     { to: `/profile/${user?.username}`, icon: <RiUser3Line />, activeIcon: <RiUser3Fill />, label: 'Profile' },
   ];
 
+  const handleNavClick = (to, e) => {
+    if (window.location.pathname === to) {
+      e.preventDefault();
+      window.location.reload();
+    }
+  };
+
   return (
     <nav className="mobile-nav">
       {navItems.map((item) => (
@@ -23,6 +30,7 @@ export default function MobileNav() {
           to={item.to}
           end={item.to === '/'}
           className={({ isActive }) => `mobile-nav-item ${isActive ? 'active' : ''}`}
+          onClick={(e) => handleNavClick(item.to, e)}
         >
           {({ isActive }) => (
             <>

@@ -36,6 +36,13 @@ export default function Sidebar() {
     navigate('/login');
   };
 
+  const handleNavClick = (to, e) => {
+    if (window.location.pathname === to) {
+      e.preventDefault();
+      window.location.reload();
+    }
+  };
+
   return (
     <aside className="sidebar">
       {/* Logo */}
@@ -52,6 +59,7 @@ export default function Sidebar() {
             to={item.to}
             end={item.to === '/'}
             className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+            onClick={(e) => handleNavClick(item.to, e)}
           >
             {({ isActive }) => (
               <>
@@ -67,6 +75,7 @@ export default function Sidebar() {
           <NavLink
             to={`/profile/${user.username}`}
             className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+            onClick={(e) => handleNavClick(`/profile/${user.username}`, e)}
           >
             {({ isActive }) => (
               <>
