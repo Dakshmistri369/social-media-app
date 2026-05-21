@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import {
@@ -32,6 +32,86 @@ export default function PostCard({ post, onDelete }) {
   const [reposted, setReposted] = useState(false);
   const menuRef = useRef(null);
   const navigate = useNavigate();
+
+  const hoverTimeoutRef = useRef(null);
+  const pressTimeoutRef = useRef(null);
+  const isPressingRef = useRef(false);
+  const preventClickRef = useRef(false);
+
+  // Clean up timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+      if (pressTimeoutRef.current) clearTimeout(pressTimeoutRef.current);
+    };
+  }, []);
+
+  // Close reactions selector when clicking outside
+  useEffect(() => {
+    if (!showReactionsSelector) return;
+    const handleOutsideClose = (e) => {
+      if (!e.target.closest('.reactions-container')) {
+        setShowReactionsSelector(false);
+      }
+    };
+    document.addEventListener('click', handleOutsideClose);
+    document.addEventListener('touchstart', handleOutsideClose);
+    return () => {
+      document.removeEventListener('click', handleOutsideClose);
+      document.removeEventListener('touchstart', handleOutsideClose);
+    };
+  }, [showReactionsSelector]);
+
+  const handlePointerEnter = (e) => {
+    if (e.pointerType === 'touch') return;
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    hoverTimeoutRef.current = setTimeout(() => {
+      setShowReactionsSelector(true);
+    }, 200);
+  };
+
+  const handlePointerLeave = (e) => {
+    if (e.pointerType === 'touch') return;
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    hoverTimeoutRef.current = setTimeout(() => {
+      setShowReactionsSelector(false);
+    }, 350);
+  };
+
+  const handleTouchStart = (e) => {
+    isPressingRef.current = true;
+    preventClickRef.current = false;
+    
+    if (pressTimeoutRef.current) clearTimeout(pressTimeoutRef.current);
+    pressTimeoutRef.current = setTimeout(() => {
+      if (isPressingRef.current) {
+        setShowReactionsSelector(true);
+        preventClickRef.current = true;
+        if (navigator.vibrate) {
+          navigator.vibrate(30);
+        }
+      }
+    }, 350);
+  };
+
+  const handleTouchEnd = (e) => {
+    isPressingRef.current = false;
+    if (pressTimeoutRef.current) clearTimeout(pressTimeoutRef.current);
+  };
+
+  const handleButtonClick = (e) => {
+    e.stopPropagation();
+    if (preventClickRef.current) {
+      preventClickRef.current = false;
+      return;
+    }
+    
+    if (showReactionsSelector) {
+      setShowReactionsSelector(false);
+    } else {
+      handleReact(myReaction || 'like');
+    }
+  };
 
   const isOwn = user?._id === post.author?._id;
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
@@ -268,12 +348,14 @@ export default function PostCard({ post, onDelete }) {
         <div className="post-actions" onClick={(e) => e.stopPropagation()}>
           <div
             className="reactions-container"
-            onMouseEnter={() => setShowReactionsSelector(true)}
-            onMouseLeave={() => setShowReactionsSelector(false)}
+            onPointerEnter={handlePointerEnter}
+            onPointerLeave={handlePointerLeave}
           >
             <button
               className={`post-action-btn react-btn ${myReaction ? 'reacted' : ''}`}
-              onClick={() => handleReact(myReaction || 'like')}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+              onClick={handleButtonClick}
             >
               <span className="react-icon-display">
                 {myReaction ? reactionsMap[myReaction] : <RiHeart3Line />}
@@ -282,12 +364,15 @@ export default function PostCard({ post, onDelete }) {
             </button>
 
             {showReactionsSelector && (
-              <div className="reactions-selector scale-in">
+              <div className="reactions-selector">
                 {Object.entries(reactionsMap).map(([type, emoji]) => (
                   <button
                     key={type}
                     className={`reaction-emoji-btn ${myReaction === type ? 'active' : ''}`}
-                    onClick={() => handleReact(type)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleReact(type);
+                    }}
                     title={type}
                   >
                     {emoji}
