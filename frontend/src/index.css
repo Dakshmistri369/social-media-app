@@ -142,6 +142,18 @@ img    { max-width: 100%; }
   transform: translateY(-1px);
 }
 
+.btn-danger {
+  background: var(--red);
+  color: #000000;
+  font-weight: 700;
+  box-shadow: 0 0 20px rgba(255, 180, 171, 0.25);
+}
+.btn-danger:hover {
+  background: #ffd2cc;
+  box-shadow: 0 0 32px rgba(255, 180, 171, 0.4);
+  transform: translateY(-1px);
+}
+
 .btn-outline {
   background: transparent;
   color: var(--accent);

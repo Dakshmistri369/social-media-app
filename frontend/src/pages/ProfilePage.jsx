@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   RiCalendarLine, RiMapPinLine, RiLinkM, RiCheckboxCircleFill,
-  RiArrowLeftLine, RiSettings3Line,
+  RiArrowLeftLine, RiSettings3Line, RiLogoutBoxLine,
 } from 'react-icons/ri';
 import { formatDistanceToNow, format } from 'date-fns';
 import useAuthStore from '../store/authStore';
@@ -14,7 +14,7 @@ import './ProfilePage.css';
 
 export default function ProfilePage() {
   const { username } = useParams();
-  const { user: currentUser, updateUser } = useAuthStore();
+  const { user: currentUser, updateUser, logout } = useAuthStore();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [posts, setPosts] = useState([]);
@@ -25,6 +25,11 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('posts');
 
   const isOwn = currentUser?.username === username;
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -112,9 +117,14 @@ export default function ProfilePage() {
               </div>
               <div className="profile-actions">
                 {isOwn ? (
-                  <button className="btn btn-outline btn-sm" onClick={() => setShowEditModal(true)}>
-                    <RiSettings3Line /> Edit Profile
-                  </button>
+                  <>
+                    <button className="btn btn-outline btn-sm" onClick={() => setShowEditModal(true)}>
+                      <RiSettings3Line /> Edit Profile
+                    </button>
+                    <button className="btn btn-danger btn-sm" onClick={handleLogout}>
+                      <RiLogoutBoxLine /> Logout
+                    </button>
+                  </>
                 ) : (
                   <button
                     className={`btn btn-sm ${isFollowing ? 'btn-outline' : 'btn-primary'}`}

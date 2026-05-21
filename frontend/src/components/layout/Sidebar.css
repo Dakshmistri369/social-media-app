@@ -4,6 +4,7 @@
 .sidebar {
   width: var(--sidebar-width);
   height: 100vh;
+  height: 100dvh;
   position: fixed;
   left: 0;
   top: 0;
@@ -11,9 +12,16 @@
   flex-direction: column;
   background: var(--bg-secondary);
   border-right: 1px solid var(--border);
-  padding: 16px 10px;
+  padding: 16px 10px 24px; /* added extra bottom padding for safety */
   z-index: 100;
   gap: 4px;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+}
+
+.sidebar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
 }
 
 /* Logo */
