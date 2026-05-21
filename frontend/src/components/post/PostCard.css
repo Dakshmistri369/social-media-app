@@ -2,15 +2,21 @@
    POST CARD — Dark Bio-Tech
 ══════════════════════════════════════ */
 .post-card {
-  background: var(--bg-card);
-  border-bottom: 1px solid var(--border-dim);
+  background: rgba(45, 90, 39, 0.12);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(164, 244, 194, 0.1);
+  border-radius: var(--radius-lg);
+  margin-bottom: 16px;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: all 0.2s ease;
   position: relative;
+  overflow: hidden;
 }
 
 .post-card:hover {
-  background: #0f160f;
+  background: rgba(45, 90, 39, 0.18);
+  border-color: rgba(164, 244, 194, 0.2);
 }
 
 .post-card-inner {
@@ -83,9 +89,9 @@
   font-family: 'JetBrains Mono', monospace;
   padding: 2px 7px;
   border-radius: 3px;
-  background: rgba(0,230,100,0.10);
+  background: rgba(164,244,194,0.10);
   color: var(--accent);
-  border: 1px solid rgba(0,230,100,0.20);
+  border: 1px solid rgba(164,244,194,0.20);
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -109,7 +115,7 @@
   position: absolute;
   top: 100%;
   right: 0;
-  background: #111a11;
+  background: var(--bg-card);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-md);
   overflow: hidden;
@@ -134,7 +140,7 @@
   font-family: inherit;
 }
 .post-menu-item:hover { background: var(--bg-hover); color: var(--text-primary); }
-.post-menu-item.danger:hover { color: var(--red); background: rgba(255,68,68,0.08); }
+.post-menu-item.danger:hover { color: var(--red); background: rgba(255,180,171,0.08); }
 
 /* Content */
 .post-content {
@@ -186,9 +192,9 @@
   font-family: 'JetBrains Mono', monospace;
   padding: 3px 8px;
   border-radius: 3px;
-  background: rgba(0,230,100,0.15);
+  background: rgba(164,244,194,0.15);
   color: var(--accent);
-  border: 1px solid rgba(0,230,100,0.30);
+  border: 1px solid rgba(164,244,194,0.30);
   backdrop-filter: blur(4px);
 }
 

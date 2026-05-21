@@ -2,13 +2,17 @@
    CREATE POST — Dark Bio-Tech
 ══════════════════════════════════════ */
 .create-post {
-  background: var(--bg-card);
-  border-bottom: 1px solid var(--border-dim);
+  background: rgba(45, 90, 39, 0.12);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(164, 244, 194, 0.1);
+  border-radius: var(--radius-lg);
   padding: 16px;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
+  margin-bottom: 24px;
 }
 .create-post.focused {
-  background: #0f160f;
+  background: rgba(45, 90, 39, 0.18);
 }
 
 .create-post-header {
@@ -25,7 +29,7 @@
 }
 
 .create-post-textarea {
-  background: rgba(255,255,255,0.03);
+  background: var(--bg-input);
   border: 1px solid var(--border-dim);
   border-radius: var(--radius-md);
   color: var(--text-primary);
@@ -40,8 +44,8 @@
 }
 .create-post-textarea::placeholder { color: var(--text-muted); }
 .create-post-textarea:focus {
-  border-color: rgba(0,230,100,0.25);
-  background: rgba(0,230,100,0.03);
+  border-color: var(--accent);
+  background: rgba(164, 244, 194, 0.03);
 }
 
 /* Preview grid */
@@ -90,7 +94,7 @@
 .toolbar-btn {
   width: 34px; height: 34px;
   border-radius: var(--radius-sm);
-  background: rgba(0,230,100,0.08);
+  background: rgba(164,244,194,0.08);
   border: 1px solid var(--border);
   color: var(--accent);
   display: flex; align-items: center; justify-content: center;
@@ -105,7 +109,7 @@
   width: auto;
 }
 .toolbar-btn:hover {
-  background: rgba(0,230,100,0.15);
+  background: rgba(164,244,194,0.15);
   border-color: var(--accent);
   box-shadow: 0 0 8px var(--accent-glow-sm);
 }
@@ -120,7 +124,7 @@
 .char-count.warning { color: var(--orange); }
 
 .visibility-select {
-  background: var(--bg-card);
+  background: var(--bg-card-2);
   border: 1px solid var(--border);
   color: var(--text-secondary);
   font-size: 12px;
@@ -134,11 +138,16 @@
 
 .post-submit-btn {
   background: var(--accent);
-  color: #000;
+  color: #003920;
+  font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
   letter-spacing: 0.5px;
   padding: 7px 18px;
-  font-size: 13px;
+  font-size: 12px;
+  border-radius: var(--radius-full);
 }
-.post-submit-btn:hover { background: var(--accent-light); }
+.post-submit-btn:hover {
+  background: var(--accent-light);
+  box-shadow: 0 0 12px var(--accent-glow-sm);
+}
 .post-submit-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }

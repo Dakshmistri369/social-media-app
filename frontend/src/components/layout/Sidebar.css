@@ -9,7 +9,7 @@
   top: 0;
   display: flex;
   flex-direction: column;
-  background: #080d08;
+  background: var(--bg-secondary);
   border-right: 1px solid var(--border);
   padding: 16px 10px;
   z-index: 100;
@@ -30,14 +30,15 @@
   height: 32px;
   object-fit: contain;
   flex-shrink: 0;
-  filter: drop-shadow(0 0 6px rgba(0,230,100,0.7));
+  filter: drop-shadow(0 0 6px var(--accent-glow));
 }
 
 .logo-text {
+  font-family: 'Syne', sans-serif;
   font-size: 19px;
   font-weight: 700;
   color: #ffffff;
-  letter-spacing: 0.5px;
+  letter-spacing: -0.5px;
 }
 
 /* Nav */
@@ -63,14 +64,14 @@
 }
 
 .sidebar-link:hover {
-  background: rgba(0,230,100,0.06);
+  background: var(--bg-hover);
   color: var(--text-primary);
 }
 
 .sidebar-link.active {
-  background: rgba(0,230,100,0.12);
+  background: rgba(164, 244, 194, 0.12);
   color: var(--accent);
-  border-color: rgba(0,230,100,0.18);
+  border-color: rgba(164, 244, 194, 0.18);
 }
 
 .sidebar-link-icon {
