@@ -71,7 +71,7 @@
 .auth-logo-img {
   width: 44px; height: 44px;
   object-fit: contain;
-  filter: drop-shadow(0 0 10px rgba(0,230,100,0.6));
+  filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.5)) drop-shadow(0 0 4px rgba(6, 182, 212, 0.5));
 }
 
 .auth-title {

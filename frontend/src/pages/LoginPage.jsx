@@ -30,8 +30,8 @@ export default function LoginPage() {
 
       <div className="auth-card scale-in">
         <div className="auth-logo">
-          <img src="/loopix-logo.svg" alt="Loopix" className="auth-logo-img" />
-          <h1 className="auth-title gradient-text">Loopix</h1>
+          <img src="/linkup-logo.svg" alt="LinkUp" className="auth-logo-img" />
+          <h1 className="auth-title gradient-text">LinkUp</h1>
         </div>
         <p className="auth-subtitle">Welcome back! Sign in to continue.</p>
 

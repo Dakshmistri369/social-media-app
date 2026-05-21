@@ -337,18 +337,18 @@ exports.generateAICaption = async (req, res) => {
       const starters = {
         professional: "Excited to share that I'm refactoring our core microservices today. Constant optimization pays off! 💻📈 #building #scaling",
         funny: "Spent 3 hours writing a script to automate a task that takes 5 seconds. Modern developer problems. 😂🤖 #programming #life",
-        cyberpunk: "[SYSTEM TRIGGER] Grid sync complete. Overclocking database nodes in the dark room. 🌐⚡ #cyberpunk #neon #loopix",
+        cyberpunk: "[SYSTEM TRIGGER] Grid sync complete. Overclocking database nodes in the dark room. 🌐⚡ #cyberpunk #neon #linkup",
         sarcastic: "Nothing says productivity like a 90-minute meeting to discuss the next meeting. Brilliant. 🙄👔 #worklife #agile"
       };
-      return starters[t?.toLowerCase()] || "Coding away on some exciting new app updates. Stay tuned! 🚀💻 #build #loopix";
+      return starters[t?.toLowerCase()] || "Coding away on some exciting new app updates. Stay tuned! 🚀💻 #build #linkup";
     }
     const tones = {
       professional: `Here is a refined version of your draft: "${p}". Looking forward to sharing this with the community. #networking #business`,
       funny: `So, I was thinking about: "${p}" and honestly, it's pretty funny. 😂 #lol #relatable`,
-      cyberpunk: `[SYSTEM UPDATE] Draft processed: "${p}". Cyber-grid synced. 🌐⚡ #cyberpunk #neon #loopix`,
+      cyberpunk: `[SYSTEM UPDATE] Draft processed: "${p}". Cyber-grid synced. 🌐⚡ #cyberpunk #neon #linkup`,
       sarcastic: `Oh, look at this masterpiece: "${p}". Groundbreaking. 🙄 #sarcasm #insightful`
     };
-    return tones[t?.toLowerCase()] || `Refined draft: "${p}". #loopix #social`;
+    return tones[t?.toLowerCase()] || `Refined draft: "${p}". #linkup #social`;
   };
 
   try {
@@ -363,12 +363,12 @@ exports.generateAICaption = async (req, res) => {
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const systemPrompt = isEmpty
-      ? `You are a social media post assistant for a platform called Loopix. Loopix is a modern, dark-themed, premium tech-focused social media app.
+      ? `You are a social media post assistant for a platform called LinkUp. LinkUp is a modern, dark-themed, premium tech-focused social media app.
 Your task is to generate a short, engaging, and catchy random status update / post about developer life, technology, programming, or coding.
 The user wants the tone of this generated post to be: "${tone || 'casual'}".
 Additionally, append 2-3 relevant hashtags at the very end of the post.
 Output ONLY the generated post content. Do not include any intros, titles, quotes or explanations.`
-      : `You are a social media post assistant for a platform called Loopix. Loopix is a modern, dark-themed, premium tech-focused social media app. 
+      : `You are a social media post assistant for a platform called LinkUp. LinkUp is a modern, dark-themed, premium tech-focused social media app. 
 Your task is to take the user's post draft and rewrite it to make it engaging, clean, and catchy.
 The user wants the tone to be: "${tone || 'casual'}".
 Additionally, append 2-3 relevant hashtags at the very end of the post.

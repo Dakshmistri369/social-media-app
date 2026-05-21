@@ -17,7 +17,7 @@ export default function RegisterPage() {
     const result = await register(form.username, form.email, form.password, form.name);
     if (result.success) {
       navigate('/');
-      toast.success('Account created! Welcome to Loopix 🚀');
+      toast.success('Account created! Welcome to LinkUp 🚀');
     } else {
       toast.error(result.message);
     }
@@ -31,8 +31,8 @@ export default function RegisterPage() {
 
       <div className="auth-card scale-in">
         <div className="auth-logo">
-          <img src="/loopix-logo.svg" alt="Loopix" className="auth-logo-img" />
-          <h1 className="auth-title gradient-text">Loopix</h1>
+          <img src="/linkup-logo.svg" alt="LinkUp" className="auth-logo-img" />
+          <h1 className="auth-title gradient-text">LinkUp</h1>
         </div>
         <p className="auth-subtitle">Join millions sharing their story.</p>
 

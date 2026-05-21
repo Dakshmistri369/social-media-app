@@ -23,7 +23,7 @@ export default function Sidebar() {
   const [showThemes, setShowThemes] = useState(false);
 
   const selectTheme = (themeName) => {
-    localStorage.setItem('loopix-theme', themeName);
+    localStorage.setItem('linkup-theme', themeName);
     document.body.className = '';
     if (themeName !== 'emerald') {
       document.body.classList.add(`theme-${themeName}`);
@@ -47,8 +47,8 @@ export default function Sidebar() {
     <aside className="sidebar">
       {/* Logo */}
       <div className="sidebar-logo">
-        <img src="/loopix-logo.svg" alt="Loopix" className="logo-img" />
-        <span className="logo-text">Loopix</span>
+        <img src="/linkup-logo.svg" alt="LinkUp" className="logo-img" />
+        <span className="logo-text">LinkUp</span>
       </div>
 
       {/* Nav */}

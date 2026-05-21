@@ -40,7 +40,7 @@ export default function App() {
     }
     
     // Load Saved Theme
-    const savedTheme = localStorage.getItem('loopix-theme') || 'emerald';
+    const savedTheme = localStorage.getItem('linkup-theme') || 'emerald';
     document.body.className = '';
     if (savedTheme !== 'emerald') {
       document.body.classList.add(`theme-${savedTheme}`);

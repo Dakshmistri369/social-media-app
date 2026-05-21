@@ -66,7 +66,7 @@ export default function RightSidebar() {
 
       {/* Footer */}
       <div className="rs-footer">
-        <p>© 2025 Loopix</p>
+        <p>© 2025 LinkUp</p>
         <p>Built with MERN Stack 🚀</p>
       </div>
     </aside>
