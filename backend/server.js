@@ -20,6 +20,7 @@ const ALLOWED_ORIGINS = [
   'http://localhost:5173',
   'http://localhost:3000',
   'https://social-media-app-uq3l.vercel.app',
+  'https://backend-three-navy-33.vercel.app',
 ];
 
 const corsOptions = {

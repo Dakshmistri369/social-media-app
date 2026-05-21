@@ -5,7 +5,7 @@ import axios from 'axios';
 // We detect production by checking if the page hostname is NOT localhost.
 // This is 100% reliable: no env var needed, no build-time flag needed.
 // ─────────────────────────────────────────────────────────────────────────────
-const PRODUCTION_API = 'https://social-media-app-uq3l.vercel.app/api';
+const PRODUCTION_API = 'https://backend-three-navy-33.vercel.app/api';
 const LOCAL_API      = 'http://localhost:5000/api';
 
 const isLocalhost =
