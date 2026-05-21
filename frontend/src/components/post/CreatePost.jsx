@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import {
   RiImageLine, RiVideoLine, RiCloseLine, RiSendPlane2Fill,
-  RiGlobalLine, RiLockLine, RiGroupLine,
+  RiGlobalLine, RiLockLine, RiGroupLine, RiMagicLine, RiBarChartLine,
 } from 'react-icons/ri';
 import useAuthStore from '../../store/authStore';
 import usePostStore from '../../store/postStore';
@@ -22,6 +22,13 @@ export default function CreatePost() {
   const [visibility, setVisibility] = useState('public');
   const [isLoading, setIsLoading] = useState(false);
   const [focused, setFocused] = useState(false);
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [aiTone, setAiTone] = useState('casual');
+  const [showAiPopover, setShowAiPopover] = useState(false);
+  const [showPollCreator, setShowPollCreator] = useState(false);
+  const [pollQuestion, setPollQuestion] = useState('');
+  const [pollOptions, setPollOptions] = useState(['', '']);
+  const [pollDuration, setPollDuration] = useState('24');
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: { 'image/*': [], 'video/*': [] },
@@ -47,9 +54,28 @@ export default function CreatePost() {
     setPreviews((prev) => prev.filter((_, idx) => idx !== i));
   };
 
+  const handleAddPollOption = () => {
+    if (pollOptions.length < 6) {
+      setPollOptions([...pollOptions, '']);
+    }
+  };
+
+  const handleRemovePollOption = (index) => {
+    if (pollOptions.length > 2) {
+      setPollOptions(pollOptions.filter((_, i) => i !== index));
+    }
+  };
+
+  const handlePollOptionChange = (index, value) => {
+    const updated = [...pollOptions];
+    updated[index] = value;
+    setPollOptions(updated);
+  };
+
   const handleSubmit = async () => {
-    if (!content.trim() && mediaFiles.length === 0) {
-      toast.error('Write something or add media!');
+    const hasPoll = showPollCreator && pollQuestion.trim() && pollOptions.filter(o => o.trim() !== '').length >= 2;
+    if (!content.trim() && mediaFiles.length === 0 && !hasPoll) {
+      toast.error('Write something, add media, or create a complete poll!');
       return;
     }
     setIsLoading(true);
@@ -79,22 +105,61 @@ export default function CreatePost() {
         uploadedMedia = data.media;
       }
 
-      const { data } = await API.post('/posts', {
+      const payload = {
         content: content.trim(),
         media: uploadedMedia,
         visibility,
-      });
+      };
+
+      if (hasPoll) {
+        payload.poll = {
+          question: pollQuestion.trim(),
+          options: pollOptions.filter(o => o.trim() !== ''),
+          duration: pollDuration,
+        };
+      }
+
+      const { data } = await API.post('/posts', payload);
 
       addPost(data.post);
       setContent('');
       setMediaFiles([]);
       setPreviews([]);
+      setPollQuestion('');
+      setPollOptions(['', '']);
+      setPollDuration('24');
+      setShowPollCreator(false);
       setFocused(false);
       toast.success('Post published! 🚀');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to post');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleAiImprove = async () => {
+    if (!content.trim()) {
+      toast.error('Write a quick draft first so the AI knows what to refine!');
+      return;
+    }
+    setIsAiLoading(true);
+    try {
+      const { data } = await API.post('/posts/ai-caption', {
+        prompt: content,
+        tone: aiTone,
+      });
+      if (data.success) {
+        setContent(data.caption);
+        toast.success('Caption improved by AI! ✨');
+        setShowAiPopover(false);
+      } else {
+        toast.error('AI refinement failed');
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'AI service unavailable');
+    } finally {
+      setIsAiLoading(false);
     }
   };
 
@@ -144,6 +209,75 @@ export default function CreatePost() {
             </div>
           )}
 
+          {/* Poll Creator Drawer */}
+          {showPollCreator && (
+            <div className="poll-creator-card scale-in">
+              <div className="poll-creator-header">
+                <span className="poll-creator-title">CREATE AN INTERACTIVE POLL</span>
+                <button
+                  type="button"
+                  className="poll-creator-close"
+                  onClick={() => setShowPollCreator(false)}
+                >
+                  <RiCloseLine />
+                </button>
+              </div>
+              <input
+                type="text"
+                className="poll-question-input"
+                placeholder="Ask a question..."
+                value={pollQuestion}
+                onChange={(e) => setPollQuestion(e.target.value)}
+              />
+              <div className="poll-creator-options">
+                {pollOptions.map((opt, i) => (
+                  <div key={i} className="poll-option-input-wrap">
+                    <input
+                      type="text"
+                      className="poll-option-input"
+                      placeholder={`Option ${i + 1}`}
+                      value={opt}
+                      onChange={(e) => handlePollOptionChange(i, e.target.value)}
+                    />
+                    {pollOptions.length > 2 && (
+                      <button
+                        type="button"
+                        className="poll-option-remove"
+                        onClick={() => handleRemovePollOption(i)}
+                      >
+                        <RiCloseLine />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div className="poll-creator-actions">
+                {pollOptions.length < 6 && (
+                  <button
+                    type="button"
+                    className="poll-option-add-btn"
+                    onClick={handleAddPollOption}
+                  >
+                    + Add Option
+                  </button>
+                )}
+                <div className="poll-duration-wrap">
+                  <label>Duration:</label>
+                  <select
+                    value={pollDuration}
+                    onChange={(e) => setPollDuration(e.target.value)}
+                    className="poll-duration-select"
+                  >
+                    <option value="1">1 Hour</option>
+                    <option value="12">12 Hours</option>
+                    <option value="24">24 Hours</option>
+                    <option value="168">7 Days</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Toolbar */}
           {focused && (
             <div className="create-post-toolbar">
@@ -157,6 +291,46 @@ export default function CreatePost() {
                 <button className="toolbar-btn sync-btn" type="button">
                   <RiGlobalLine /> SYNC
                 </button>
+                <button
+                  className={`toolbar-btn poll-trigger-btn ${showPollCreator ? 'active' : ''}`}
+                  type="button"
+                  onClick={() => setShowPollCreator(!showPollCreator)}
+                >
+                  <RiBarChartLine /> POLL
+                </button>
+                <div className="ai-assistant-wrap">
+                  <button
+                    className="toolbar-btn ai-spark-btn"
+                    type="button"
+                    onClick={() => setShowAiPopover(!showAiPopover)}
+                  >
+                    <RiMagicLine /> AI WRITE
+                  </button>
+                  {showAiPopover && (
+                    <div className="ai-popover scale-in">
+                      <div className="ai-popover-title">AI Enhancer</div>
+                      <select
+                        className="ai-select"
+                        value={aiTone}
+                        onChange={(e) => setAiTone(e.target.value)}
+                      >
+                        <option value="casual">Casual</option>
+                        <option value="professional">Professional</option>
+                        <option value="funny">Funny</option>
+                        <option value="cyberpunk">Cyberpunk</option>
+                        <option value="sarcastic">Sarcastic</option>
+                      </select>
+                      <button
+                        className="btn btn-primary btn-sm ai-generate-btn"
+                        onClick={handleAiImprove}
+                        disabled={isAiLoading || !content.trim()}
+                        type="button"
+                      >
+                        {isAiLoading ? 'Improving...' : 'Improve'}
+                      </button>
+                    </div>
+                  )}
+                </div>
                 <select
                   className="visibility-select"
                   value={visibility}

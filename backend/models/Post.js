@@ -19,6 +19,22 @@ const postSchema = new mongoose.Schema({
     },
   ],
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  reactions: [
+    {
+      user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+      type: { type: String, enum: ['like', 'love', 'haha', 'wow', 'sad', 'angry'], default: 'like', required: true }
+    }
+  ],
+  poll: {
+    question: { type: String },
+    options: [
+      {
+        optionText: { type: String, required: true },
+        votes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+      }
+    ],
+    expiresAt: { type: Date }
+  },
   comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
   shares: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   tags: [{ type: String }],

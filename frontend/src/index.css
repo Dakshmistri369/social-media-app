@@ -495,3 +495,64 @@ textarea.input { resize: vertical; min-height: 80px; }
   }
 }
 
+/* ── Theme Engine Presets ── */
+body.theme-cyberpunk {
+  --bg-primary: #110815;
+  --bg-secondary: #08030c;
+  --bg-card: #220d2a;
+  --bg-card-2: #190a20;
+  --bg-hover: rgba(255, 0, 128, 0.1);
+  --bg-input: #1d0924;
+
+  --accent: #ff007f;
+  --accent-dim: #d40066;
+  --accent-glow: rgba(255, 0, 127, 0.25);
+  --accent-glow-sm: rgba(255, 0, 127, 0.15);
+  --accent-gradient: linear-gradient(135deg, #ff007f, #00f0ff);
+  
+  --text-mono: #ff007f;
+  --border: rgba(255, 0, 127, 0.12);
+  --border-light: rgba(255, 0, 127, 0.22);
+  --accent-dark: #8c0046;
+}
+
+body.theme-deepspace {
+  --bg-primary: #030307;
+  --bg-secondary: #010103;
+  --bg-card: #0c0c16;
+  --bg-card-2: #08080f;
+  --bg-hover: rgba(99, 102, 241, 0.1);
+  --bg-input: #0a0a11;
+
+  --accent: #6366f1;
+  --accent-dim: #4f46e5;
+  --accent-glow: rgba(99, 102, 241, 0.25);
+  --accent-glow-sm: rgba(99, 102, 241, 0.15);
+  --accent-gradient: linear-gradient(135deg, #6366f1, #3b82f6);
+  
+  --text-mono: #6366f1;
+  --border: rgba(99, 102, 241, 0.1);
+  --border-light: rgba(99, 102, 241, 0.2);
+  --accent-dark: #312e81;
+}
+
+body.theme-amethyst {
+  --bg-primary: #0d071a;
+  --bg-secondary: #070410;
+  --bg-card: #1c102f;
+  --bg-card-2: #160c25;
+  --bg-hover: rgba(168, 85, 247, 0.1);
+  --bg-input: #170d27;
+
+  --accent: #a855f7;
+  --accent-dim: #9333ea;
+  --accent-glow: rgba(168, 85, 247, 0.25);
+  --accent-glow-sm: rgba(168, 85, 247, 0.15);
+  --accent-gradient: linear-gradient(135deg, #a855f7, #ec4899);
+  
+  --text-mono: #a855f7;
+  --border: rgba(168, 85, 247, 0.1);
+  --border-light: rgba(168, 85, 247, 0.2);
+  --accent-dark: #581c87;
+}
+

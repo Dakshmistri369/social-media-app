@@ -131,8 +131,12 @@ io.on('connection', (socket) => {
   });
 });
 
-// Attach io to every request
-app.use((req, res, next) => { req.io = io; next(); });
+// Attach io and onlineUsers to every request
+app.use((req, res, next) => {
+  req.io = io;
+  req.onlineUsers = onlineUsers;
+  next();
+});
 
 // ── Routes ───────────────────────────────────────────────────────────────────
 app.use('/api/auth',          require('./routes/auth'));
@@ -141,6 +145,8 @@ app.use('/api/posts',         require('./routes/posts'));
 app.use('/api/comments',      require('./routes/comments'));
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/upload',        require('./routes/upload'));
+app.use('/api/stories',       require('./routes/stories'));
+app.use('/api/chats',         require('./routes/chats'));
 
 // Health check
 app.get('/api/health', (req, res) => {

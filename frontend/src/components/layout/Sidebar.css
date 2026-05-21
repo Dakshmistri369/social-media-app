@@ -164,6 +164,69 @@
   background: rgba(255,68,68,0.10);
 }
 
+/* Theme Engine Styles */
+.sidebar-theme-container {
+  position: relative;
+  width: 100%;
+}
+
+.theme-trigger-btn {
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  border: 1px solid transparent;
+}
+
+.theme-dropdown {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: var(--shadow-md);
+  z-index: 110;
+  margin-bottom: 8px;
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  width: 100%;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 550;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.theme-option:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.theme-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+.emerald-dot { background: #a4f4c2; box-shadow: 0 0 6px rgba(164, 244, 194, 0.6); }
+.cyberpunk-dot { background: #ff007f; box-shadow: 0 0 6px rgba(255, 0, 127, 0.6); }
+.deepspace-dot { background: #6366f1; box-shadow: 0 0 6px rgba(99, 102, 241, 0.6); }
+.amethyst-dot { background: #a855f7; box-shadow: 0 0 6px rgba(168, 85, 247, 0.6); }
+
 @media (max-width: 768px) {
   .sidebar { display: none; }
 }

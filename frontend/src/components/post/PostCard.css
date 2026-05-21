@@ -245,3 +245,129 @@
 .save-btn:hover  { color: var(--accent); }
 
 .share-btn:hover { color: var(--text-primary); }
+
+/* Reactions System Styles */
+.reactions-container {
+  position: relative;
+  display: inline-block;
+}
+
+.react-btn.reacted {
+  color: var(--accent);
+  background: rgba(164, 244, 194, 0.08);
+}
+
+.reactions-selector {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-full);
+  padding: 6px 10px;
+  display: flex;
+  gap: 8px;
+  box-shadow: var(--shadow-lg);
+  z-index: 100;
+  margin-bottom: 8px;
+  backdrop-filter: blur(12px);
+}
+
+.reaction-emoji-btn {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+  padding: 2px;
+}
+
+.reaction-emoji-btn:hover {
+  transform: scale(1.3);
+}
+
+.reaction-emoji-btn.active {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
+
+/* Poll System Styles */
+.post-poll-container {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+.poll-question {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.poll-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.poll-option-btn {
+  position: relative;
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.poll-option-btn:hover {
+  border-color: var(--accent);
+  background: rgba(164, 244, 194, 0.03);
+}
+
+.poll-option-btn.voted {
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+.poll-option-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background: rgba(164, 244, 194, 0.08);
+  z-index: 1;
+  transition: width 0.4s cubic-bezier(0.1, 0.8, 0.2, 1);
+}
+
+.poll-option-text {
+  position: relative;
+  z-index: 2;
+}
+
+.poll-option-percentage {
+  position: relative;
+  z-index: 2;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+}
+
+.poll-footer {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 10px;
+}
+

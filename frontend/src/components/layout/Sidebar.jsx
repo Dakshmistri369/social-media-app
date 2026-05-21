@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { NavLink, useNavigate, Link } from 'react-router-dom';
 import {
   RiHome5Line, RiHome5Fill, RiCompassLine, RiCompassFill,
   RiBellLine, RiBellFill, RiBookmarkLine, RiBookmarkFill,
-  RiUser3Line, RiUser3Fill, RiLogoutBoxLine,
+  RiUser3Line, RiUser3Fill, RiLogoutBoxLine, RiPaletteLine,
+  RiMailLine, RiMailFill,
 } from 'react-icons/ri';
 import useAuthStore from '../../store/authStore';
 import './Sidebar.css';
@@ -11,12 +13,23 @@ const navItems = [
   { to: '/', icon: <RiHome5Line />, activeIcon: <RiHome5Fill />, label: 'Home' },
   { to: '/explore', icon: <RiCompassLine />, activeIcon: <RiCompassFill />, label: 'Explore' },
   { to: '/notifications', icon: <RiBellLine />, activeIcon: <RiBellFill />, label: 'Notifications' },
+  { to: '/messages', icon: <RiMailLine />, activeIcon: <RiMailFill />, label: 'Messages' },
   { to: '/saved', icon: <RiBookmarkLine />, activeIcon: <RiBookmarkFill />, label: 'Saved' },
 ];
 
 export default function Sidebar() {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
+  const [showThemes, setShowThemes] = useState(false);
+
+  const selectTheme = (themeName) => {
+    localStorage.setItem('loopix-theme', themeName);
+    document.body.className = '';
+    if (themeName !== 'emerald') {
+      document.body.classList.add(`theme-${themeName}`);
+    }
+    setShowThemes(false);
+  };
 
   const handleLogout = () => {
     logout();
@@ -63,6 +76,30 @@ export default function Sidebar() {
             )}
           </NavLink>
         )}
+
+        {/* Theme Trigger & Dropdown */}
+        <div className="sidebar-theme-container">
+          <button className="sidebar-link theme-trigger-btn" onClick={() => setShowThemes(!showThemes)}>
+            <span className="sidebar-link-icon"><RiPaletteLine /></span>
+            <span className="sidebar-link-label">Theme</span>
+          </button>
+          {showThemes && (
+            <div className="theme-dropdown scale-in">
+              <button onClick={() => selectTheme('emerald')} className="theme-option emerald">
+                <span className="theme-dot emerald-dot" /> Emerald
+              </button>
+              <button onClick={() => selectTheme('cyberpunk')} className="theme-option cyberpunk">
+                <span className="theme-dot cyberpunk-dot" /> Cyberpunk
+              </button>
+              <button onClick={() => selectTheme('deepspace')} className="theme-option deepspace">
+                <span className="theme-dot deepspace-dot" /> Deep Space
+              </button>
+              <button onClick={() => selectTheme('amethyst')} className="theme-option amethyst">
+                <span className="theme-dot amethyst-dot" /> Amethyst
+              </button>
+            </div>
+          )}
+        </div>
       </nav>
 
       {/* User card */}

@@ -32,7 +32,7 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
-const SERVER_URL = isLocalhost ? 'http://localhost:5000' : 'https://backend-three-navy-33.vercel.app';
+export const SERVER_URL = isLocalhost ? 'http://localhost:5000' : 'https://backend-three-navy-33.vercel.app';
 
 const normalizeAssets = (obj) => {
   if (!obj) return obj;

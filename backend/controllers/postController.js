@@ -86,15 +86,24 @@ exports.getPost = async (req, res) => {
 // @POST /api/posts
 exports.createPost = async (req, res) => {
   try {
-    const { content, visibility, hashtags } = req.body;
+    const { content, visibility, hashtags, poll } = req.body;
     let media = [];
 
     if (req.body.media && Array.isArray(req.body.media)) {
       media = req.body.media;
     }
 
-    if (!content && media.length === 0) {
-      return res.status(400).json({ success: false, message: 'Post must have content or media' });
+    let pollData = undefined;
+    if (poll && poll.question && Array.isArray(poll.options) && poll.options.length > 0) {
+      pollData = {
+        question: poll.question,
+        options: poll.options.filter(o => o.trim() !== '').map(text => ({ optionText: text, votes: [] })),
+        expiresAt: poll.duration ? new Date(Date.now() + parseInt(poll.duration) * 60 * 60 * 1000) : undefined
+      };
+    }
+
+    if (!content && media.length === 0 && !pollData) {
+      return res.status(400).json({ success: false, message: 'Post must have content, media, or a poll' });
     }
 
     const extractedHashtags = (content || '').match(/#\w+/g)?.map(t => t.toLowerCase()) || [];
@@ -104,6 +113,7 @@ exports.createPost = async (req, res) => {
       author: req.user._id,
       content,
       media,
+      poll: pollData,
       visibility: visibility || 'public',
       hashtags: allHashtags,
     });
@@ -251,6 +261,154 @@ exports.searchPosts = async (req, res) => {
       .limit(20)
       .populate('author', 'username name avatar isVerified');
     res.json({ success: true, posts });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// @POST /api/posts/ai-caption
+exports.generateAICaption = async (req, res) => {
+  try {
+    const { prompt, tone } = req.body;
+    if (!prompt) {
+      return res.status(400).json({ success: false, message: 'Draft prompt is required' });
+    }
+
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      // Fallback response for local development without a key
+      const tones = {
+        professional: `Here is a refined version of your draft: "${prompt}". Looking forward to sharing this with the community. #networking #business`,
+        funny: `So, I was thinking about: "${prompt}" and honestly, it's pretty funny. 😂 #lol #relatable`,
+        cyberpunk: `[SYSTEM UPDATE] Draft processed: "${prompt}". Cyber-grid synced. 🌐⚡ #cyberpunk #neon #loopix`,
+        sarcastic: `Oh, look at this masterpiece: "${prompt}". Groundbreaking. 🙄 #sarcasm #insightful`
+      };
+      const text = tones[tone?.toLowerCase()] || `Refined draft: "${prompt}". #loopix #social`;
+      return res.json({ success: true, caption: text });
+    }
+
+    const { GoogleGenerativeAI } = require('@google/generative-ai');
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+    const systemPrompt = `You are a social media post assistant for a platform called Loopix. Loopix is a modern, dark-themed, premium tech-focused social media app. 
+Your task is to take the user's post draft and rewrite it to make it engaging, clean, and catchy.
+The user wants the tone to be: "${tone || 'casual'}".
+Additionally, append 2-3 relevant hashtags at the very end of the post.
+Output ONLY the generated post content. Do not include any intros, titles, quotes or explanations.`;
+
+    const result = await model.generateContent([
+      systemPrompt,
+      `User's Post Draft: ${prompt}`
+    ]);
+    const response = await result.response;
+    const text = response.text().trim();
+
+    res.json({ success: true, caption: text });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// @PUT /api/posts/:id/react
+exports.reactPost = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ success: false, message: 'Post not found' });
+
+    const userId = req.user._id;
+    const { type } = req.body;
+    
+    if (!['like', 'love', 'haha', 'wow', 'sad', 'angry'].includes(type)) {
+      return res.status(400).json({ success: false, message: 'Invalid reaction type' });
+    }
+
+    if (!post.reactions) {
+      post.reactions = [];
+    }
+
+    const existingIndex = post.reactions.findIndex(r => r.user.toString() === userId.toString());
+
+    if (existingIndex > -1) {
+      if (post.reactions[existingIndex].type === type) {
+        // Toggle off if clicking the same reaction
+        post.reactions.splice(existingIndex, 1);
+      } else {
+        // Change reaction type
+        post.reactions[existingIndex].type = type;
+      }
+    } else {
+      // Add new reaction
+      post.reactions.push({ user: userId, type });
+      
+      // Notify author
+      if (post.author.toString() !== userId.toString()) {
+        await Notification.create({
+          recipient: post.author,
+          sender: userId,
+          type: 'like', // Notification type fallback
+          post: post._id,
+          message: `${req.user.username} reacted with ${type} to your post`,
+        });
+        req.io?.emit('notification', { recipient: post.author });
+      }
+    }
+
+    await post.save();
+    res.json({ success: true, reactions: post.reactions });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// @PUT /api/posts/:id/poll/vote
+exports.votePoll = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ success: false, message: 'Post not found' });
+    if (!post.poll || !post.poll.options) {
+      return res.status(400).json({ success: false, message: 'Post does not contain a poll' });
+    }
+
+    if (post.poll.expiresAt && new Date() > new Date(post.poll.expiresAt)) {
+      return res.status(400).json({ success: false, message: 'Poll has expired' });
+    }
+
+    const userId = req.user._id;
+    const { optionId } = req.body;
+
+    // Check if user has already voted in this poll
+    let userVotedOptionId = null;
+    post.poll.options.forEach(opt => {
+      if (opt.votes.some(vId => vId.toString() === userId.toString())) {
+        userVotedOptionId = opt._id.toString();
+      }
+    });
+
+    if (userVotedOptionId) {
+      // Toggle off if voting for the same option, or transition to the new option
+      post.poll.options.forEach(opt => {
+        if (opt._id.toString() === userVotedOptionId) {
+          opt.votes = opt.votes.filter(vId => vId.toString() !== userId.toString());
+        }
+      });
+
+      if (userVotedOptionId !== optionId) {
+        const option = post.poll.options.id(optionId);
+        if (option) {
+          option.votes.push(userId);
+        }
+      }
+    } else {
+      const option = post.poll.options.id(optionId);
+      if (!option) {
+        return res.status(404).json({ success: false, message: 'Poll option not found' });
+      }
+      option.votes.push(userId);
+    }
+
+    await post.save();
+    res.json({ success: true, poll: post.poll });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

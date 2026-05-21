@@ -2,6 +2,7 @@ import { useEffect, useCallback, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import usePostStore from '../store/postStore';
 import CreatePost from '../components/post/CreatePost';
+import Stories from '../components/story/Stories';
 import PostCard from '../components/post/PostCard';
 import RightSidebar from '../components/sidebar/RightSidebar';
 import './FeedPage.css';
@@ -28,6 +29,7 @@ export default function FeedPage() {
     <div className="feed-layout">
       <div className="feed-column">
         <CreatePost />
+        <Stories />
 
         <div className="posts-list">
           {feedPosts.map((post) => (

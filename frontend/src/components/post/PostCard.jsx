@@ -12,14 +12,23 @@ import API from '../../utils/api';
 import toast from 'react-hot-toast';
 import './PostCard.css';
 
+const reactionsMap = {
+  like: '👍',
+  love: '❤️',
+  haha: '😂',
+  wow: '😮',
+  sad: '😢',
+  angry: '😡'
+};
+
 export default function PostCard({ post, onDelete }) {
   const { user } = useAuthStore();
-  const { toggleLike, removePost } = usePostStore();
-  const [liked, setLiked] = useState(post.likes?.includes(user?._id));
-  const [likeCount, setLikeCount] = useState(post.likes?.length || 0);
+  const { removePost } = usePostStore();
+  const [reactions, setReactions] = useState(post.reactions || []);
+  const [showReactionsSelector, setShowReactionsSelector] = useState(false);
+  const [poll, setPoll] = useState(post.poll);
   const [saved, setSaved] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-  const [likeAnim, setLikeAnim] = useState(false);
   const [reposted, setReposted] = useState(false);
   const menuRef = useRef(null);
   const navigate = useNavigate();
@@ -27,20 +36,27 @@ export default function PostCard({ post, onDelete }) {
   const isOwn = user?._id === post.author?._id;
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
 
-  const handleLike = async (e) => {
-    e.stopPropagation();
+  const myReaction = reactions.find(r => r.user === user?._id || r.user?._id === user?._id)?.type;
+
+  const handleReact = async (type) => {
     if (!user) { navigate('/login'); return; }
-    const wasLiked = liked;
-    setLiked(!wasLiked);
-    setLikeCount((c) => wasLiked ? c - 1 : c + 1);
-    setLikeAnim(true);
-    setTimeout(() => setLikeAnim(false), 350);
-    toggleLike(post._id, user._id);
     try {
-      await API.put(`/posts/${post._id}/like`);
+      const { data } = await API.put(`/posts/${post._id}/react`, { type });
+      setReactions(data.reactions);
+      setShowReactionsSelector(false);
     } catch {
-      setLiked(wasLiked);
-      setLikeCount((c) => wasLiked ? c + 1 : c - 1);
+      toast.error('Failed to react');
+    }
+  };
+
+  const handlePollVote = async (optionId) => {
+    if (!user) { navigate('/login'); return; }
+    try {
+      const { data } = await API.put(`/posts/${post._id}/poll/vote`, { optionId });
+      setPoll(data.poll);
+      toast.success('Vote updated!');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Voting failed');
     }
   };
 
@@ -181,15 +197,71 @@ export default function PostCard({ post, onDelete }) {
           </div>
         )}
 
+        {/* Poll */}
+        {poll && poll.options && (
+          <div className="post-poll-container" onClick={(e) => e.stopPropagation()}>
+            <div className="poll-question">{poll.question}</div>
+            <div className="poll-options">
+              {poll.options.map((opt) => {
+                const totalVotes = poll.options.reduce((sum, o) => sum + o.votes.length, 0);
+                const isVoted = opt.votes.includes(user?._id);
+                const percentage = totalVotes > 0 ? Math.round((opt.votes.length / totalVotes) * 100) : 0;
+                
+                return (
+                  <button
+                    key={opt._id}
+                    className={`poll-option-btn ${isVoted ? 'voted' : ''}`}
+                    onClick={() => handlePollVote(opt._id)}
+                  >
+                    <div className="poll-option-fill" style={{ width: `${percentage}%` }} />
+                    <span className="poll-option-text">{opt.optionText}</span>
+                    <span className="poll-option-percentage">{percentage}% ({opt.votes.length})</span>
+                  </button>
+                );
+              })}
+            </div>
+            {poll.expiresAt && (
+              <div className="poll-footer">
+                {new Date(poll.expiresAt) > new Date()
+                  ? `Active · Ends ${new Date(poll.expiresAt).toLocaleDateString()}`
+                  : 'Poll ended'}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Actions */}
         <div className="post-actions" onClick={(e) => e.stopPropagation()}>
-          <button
-            className={`post-action-btn like-btn ${liked ? 'liked' : ''} ${likeAnim ? 'liked-anim' : ''}`}
-            onClick={handleLike}
+          <div
+            className="reactions-container"
+            onMouseEnter={() => setShowReactionsSelector(true)}
+            onMouseLeave={() => setShowReactionsSelector(false)}
           >
-            {liked ? <RiHeart3Fill /> : <RiHeart3Line />}
-            <span>{likeCount}</span>
-          </button>
+            <button
+              className={`post-action-btn react-btn ${myReaction ? 'reacted' : ''}`}
+              onClick={() => handleReact(myReaction || 'like')}
+            >
+              <span className="react-icon-display">
+                {myReaction ? reactionsMap[myReaction] : <RiHeart3Line />}
+              </span>
+              <span>{reactions.length}</span>
+            </button>
+
+            {showReactionsSelector && (
+              <div className="reactions-selector scale-in">
+                {Object.entries(reactionsMap).map(([type, emoji]) => (
+                  <button
+                    key={type}
+                    className={`reaction-emoji-btn ${myReaction === type ? 'active' : ''}`}
+                    onClick={() => handleReact(type)}
+                    title={type}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           <button className="post-action-btn comment-btn" onClick={() => navigate(`/post/${post._id}`)}>
             <RiChat3Line />
