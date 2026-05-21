@@ -48,3 +48,4 @@ desktop.ini
 # ── Local uploads ─────────────────────
 backend/uploads/
 uploads/
+.vercel
