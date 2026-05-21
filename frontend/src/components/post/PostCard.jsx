@@ -40,11 +40,45 @@ export default function PostCard({ post, onDelete }) {
 
   const handleReact = async (type) => {
     if (!user) { navigate('/login'); return; }
+    
+    // Backup current reactions for rollback
+    const previousReactions = [...reactions];
+    
+    // Determine the current user's ID
+    const userId = user._id || user.id;
+    
+    // Find if the user has an existing reaction
+    const existingIndex = reactions.findIndex(r => {
+      const reactionUser = r.user?._id || r.user;
+      return reactionUser?.toString() === userId?.toString();
+    });
+
+    let optimisticReactions = [];
+    if (existingIndex > -1) {
+      if (reactions[existingIndex].type === type) {
+        // Clicking same emoji toggles it off
+        optimisticReactions = reactions.filter((_, idx) => idx !== existingIndex);
+      } else {
+        // Change to another emoji type
+        optimisticReactions = reactions.map((r, idx) =>
+          idx === existingIndex ? { ...r, type } : r
+        );
+      }
+    } else {
+      // Add new reaction
+      optimisticReactions = [...reactions, { user: userId, type }];
+    }
+
+    // Instantly update state for seamless responsive feel
+    setReactions(optimisticReactions);
+    setShowReactionsSelector(false);
+
     try {
       const { data } = await API.put(`/posts/${post._id}/react`, { type });
       setReactions(data.reactions);
-      setShowReactionsSelector(false);
     } catch {
+      // Revert on failure
+      setReactions(previousReactions);
       toast.error('Failed to react');
     }
   };

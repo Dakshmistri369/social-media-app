@@ -6,6 +6,7 @@ import useAuthStore from '../store/authStore';
 import { socket } from '../utils/socket';
 import { formatDistanceToNow } from 'date-fns';
 import toast from 'react-hot-toast';
+import { getSharedKey, encryptMessage, decryptMessage } from '../utils/crypto';
 import './MessagesPage.css';
 
 export default function MessagesPage() {
@@ -161,9 +162,13 @@ export default function MessagesPage() {
         }
       }
 
+      // E2EE Encryption
+      const secretKey = getSharedKey(currentUser._id || currentUser.id, recipient._id);
+      const encryptedText = encryptMessage(text.trim(), secretKey);
+
       const { data } = await API.post('/chats/messages', {
         recipientId: recipient._id,
-        text: text.trim(),
+        text: encryptedText,
         mediaUrl,
         mediaType
       });
@@ -218,6 +223,11 @@ export default function MessagesPage() {
             const isOnline = isPartnerOnline(partner._id);
             const isActive = activeConversation && activeConversation._id === chat._id;
             
+            const secretKey = getSharedKey(currentUser._id || currentUser.id, partner._id);
+            const decryptedSnippet = chat.lastMessage?.text 
+              ? decryptMessage(chat.lastMessage.text, secretKey)
+              : '';
+            
             return (
               <div
                 key={chat._id}
@@ -246,7 +256,7 @@ export default function MessagesPage() {
                   <div className="conversation-bottom-row">
                     <span className="snippet-text">
                       {chat.lastMessage?.sender?._id === currentUser._id ? 'You: ' : ''}
-                      {chat.lastMessage?.text || (chat.lastMessage?.mediaUrl ? 'Shared an attachment' : 'Start chatting...')}
+                      {decryptedSnippet || (chat.lastMessage?.mediaUrl ? 'Shared an attachment' : 'Start chatting...')}
                     </span>
                   </div>
                 </div>
@@ -277,9 +287,14 @@ export default function MessagesPage() {
                 </div>
                 <div className="chat-header-info">
                   <span className="chat-header-name">{getChatPartner(activeConversation).name}</span>
-                  <span className="chat-header-status">
-                    {isPartnerOnline(getChatPartner(activeConversation)._id) ? 'Online' : 'Offline'}
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span className="chat-header-status">
+                      {isPartnerOnline(getChatPartner(activeConversation)._id) ? 'Online' : 'Offline'}
+                    </span>
+                    <span className="e2ee-badge" title="End-to-End Encrypted" style={{ fontSize: '11px', color: 'var(--accent)', opacity: 0.8, display: 'flex', alignItems: 'center', gap: '2px' }}>
+                      • 🔒 E2EE
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -288,6 +303,10 @@ export default function MessagesPage() {
             <div className="chat-scroller">
               {messages.map((msg) => {
                 const isMine = msg.sender?._id === currentUser._id || msg.sender === currentUser._id;
+                const partner = getChatPartner(activeConversation);
+                const secretKey = getSharedKey(currentUser._id || currentUser.id, partner._id);
+                const decryptedText = decryptMessage(msg.text, secretKey);
+
                 return (
                   <div key={msg._id} className={`message-bubble-wrapper ${isMine ? 'mine' : 'theirs'}`}>
                     <div className="message-bubble">
@@ -300,7 +319,7 @@ export default function MessagesPage() {
                           )}
                         </div>
                       )}
-                      {msg.text && <p className="message-text">{msg.text}</p>}
+                      {msg.text && <p className="message-text">{decryptedText}</p>}
                     </div>
                     <span className="message-time">
                       {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
