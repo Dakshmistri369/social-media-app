@@ -9,7 +9,7 @@ const getStories = async (req, res) => {
     }
     
     // Fetch stories from the user themselves and people they follow
-    const followingAndMe = [...currentUser.following, req.user.id];
+    const followingAndMe = [...(currentUser.following || []), req.user._id];
 
     const stories = await Story.find({ user: { $in: followingAndMe } })
       .populate('user', 'name username avatar')
@@ -42,7 +42,7 @@ const createStory = async (req, res) => {
     }
 
     const newStory = new Story({
-      user: req.user.id,
+      user: req.user._id,
       mediaUrl,
       mediaType: mediaType || 'image',
       caption: caption || ''

@@ -171,14 +171,17 @@ export default function Stories() {
             </div>
           </div>
           <span className="story-username">Your Story</span>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            accept="image/*,video/*"
-            style={{ display: 'none' }}
-          />
         </div>
+
+        {/* Hidden File Input */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          onClick={(e) => e.stopPropagation()}
+          accept="image/*,video/*"
+          style={{ display: 'none' }}
+        />
 
         {/* Dynamic Story Circles */}
         {groupedStories.map((group, userIndex) => (
