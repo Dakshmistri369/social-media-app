@@ -91,6 +91,63 @@
   box-shadow: 0 4px 14px var(--accent-glow) !important;
 }
 
+/* ── Tag Preview Popup ── */
+@keyframes tag-preview-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.tag-preview-popup {
+  position: relative;
+  margin-top: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  animation: tag-preview-in 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.175) forwards;
+  max-width: 280px;
+}
+
+.tag-preview-img {
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+  display: block;
+  border-bottom: 1px solid var(--border);
+  transition: transform 0.4s ease;
+}
+
+.tag-preview-popup:hover .tag-preview-img {
+  transform: scale(1.04);
+}
+
+.tag-preview-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 14px;
+}
+
+.tag-preview-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.tag-preview-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
 /* Explore grid */
 .explore-grid { columns: 2; gap: 12px; }
 @media (max-width: 600px) { .explore-grid { columns: 1; } }

@@ -7,7 +7,58 @@ import usePostStore from '../store/postStore';
 import API from '../utils/api';
 import './ExplorePage.css';
 
-const TRENDING_TAGS = ['#javascript', '#react', '#webdev', '#ai', '#design', '#coding', '#mern', '#nodejs', '#tech', '#programming'];
+const TRENDING_TAGS = [
+  {
+    tag: '#javascript',
+    image: 'https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=320&q=80',
+    desc: 'The language of the web',
+  },
+  {
+    tag: '#react',
+    image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=320&q=80',
+    desc: 'Build UIs with components',
+  },
+  {
+    tag: '#webdev',
+    image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=320&q=80',
+    desc: 'Crafting the modern web',
+  },
+  {
+    tag: '#ai',
+    image: 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=320&q=80',
+    desc: 'Artificial Intelligence & ML',
+  },
+  {
+    tag: '#design',
+    image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=320&q=80',
+    desc: 'Beautiful UI & UX design',
+  },
+  {
+    tag: '#coding',
+    image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=320&q=80',
+    desc: 'Write code, change the world',
+  },
+  {
+    tag: '#mern',
+    image: 'https://images.unsplash.com/photo-1555099962-4199c345e5dd?w=320&q=80',
+    desc: 'MongoDB, Express, React, Node',
+  },
+  {
+    tag: '#nodejs',
+    image: 'https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=320&q=80',
+    desc: 'Server-side JavaScript',
+  },
+  {
+    tag: '#tech',
+    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=320&q=80',
+    desc: 'The future is tech',
+  },
+  {
+    tag: '#programming',
+    image: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=320&q=80',
+    desc: 'Code is poetry',
+  },
+];
 
 export default function ExplorePage() {
   const { explorePosts, fetchExplore, isLoading, hasMore } = usePostStore();
@@ -16,10 +67,12 @@ export default function ExplorePage() {
   const [userResults, setUserResults] = useState([]);
   const [activeTag, setActiveTag] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [previewTag, setPreviewTag] = useState(null); // { tag, image, desc, rect }
   const location = useLocation();
   const initialized = useRef(false);
   const { ref: loadMoreRef, inView } = useInView({ threshold: 0 });
   const searchDebounce = useRef(null);
+  const previewTimeout = useRef(null);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -32,6 +85,22 @@ export default function ExplorePage() {
   useEffect(() => {
     if (inView && hasMore && !isLoading && initialized.current) fetchExplore(false, activeTag);
   }, [inView]);
+
+  // Dismiss preview on outside click
+  useEffect(() => {
+    if (!previewTag) return;
+    const dismiss = (e) => {
+      if (!e.target.closest('.tag-preview-popup') && !e.target.closest('.tag')) {
+        setPreviewTag(null);
+      }
+    };
+    document.addEventListener('click', dismiss);
+    document.addEventListener('touchstart', dismiss);
+    return () => {
+      document.removeEventListener('click', dismiss);
+      document.removeEventListener('touchstart', dismiss);
+    };
+  }, [previewTag]);
 
   const handleSearch = (q) => {
     setSearchQuery(q);
@@ -49,6 +118,20 @@ export default function ExplorePage() {
       } catch {}
       finally { setIsSearching(false); }
     }, 400);
+  };
+
+  const showPreview = (item, el) => {
+    clearTimeout(previewTimeout.current);
+    const rect = el.getBoundingClientRect();
+    setPreviewTag({ ...item, rect });
+  };
+
+  const hidePreview = () => {
+    previewTimeout.current = setTimeout(() => setPreviewTag(null), 200);
+  };
+
+  const stayPreview = () => {
+    clearTimeout(previewTimeout.current);
   };
 
   const isSearchMode = searchQuery.trim().length > 0;
@@ -83,16 +166,41 @@ export default function ExplorePage() {
               >
                 All
               </button>
-              {TRENDING_TAGS.map((tag) => (
+              {TRENDING_TAGS.map((item) => (
                 <button
-                  key={tag}
-                  className={`tag ${activeTag === tag ? 'active-tag' : ''}`}
-                  onClick={() => { setActiveTag(tag); fetchExplore(true, tag); }}
+                  key={item.tag}
+                  className={`tag ${activeTag === item.tag ? 'active-tag' : ''}`}
+                  onClick={() => { setActiveTag(item.tag); fetchExplore(true, item.tag); }}
+                  onMouseEnter={(e) => showPreview(item, e.currentTarget)}
+                  onMouseLeave={hidePreview}
+                  onTouchStart={(e) => {
+                    e.preventDefault();
+                    showPreview(item, e.currentTarget);
+                  }}
                 >
-                  {tag}
+                  {item.tag}
                 </button>
               ))}
             </div>
+
+            {/* Tag Preview Popup */}
+            {previewTag && (
+              <div
+                className="tag-preview-popup"
+                onMouseEnter={stayPreview}
+                onMouseLeave={hidePreview}
+              >
+                <img
+                  src={previewTag.image}
+                  alt={previewTag.tag}
+                  className="tag-preview-img"
+                />
+                <div className="tag-preview-body">
+                  <span className="tag-preview-name">{previewTag.tag}</span>
+                  <span className="tag-preview-desc">{previewTag.desc}</span>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -158,7 +266,6 @@ export default function ExplorePage() {
 }
 
 function ExploreMediaCard({ post }) {
-  const navigate = (path) => window.location.assign(path);
   return (
     <div className="explore-media-card" onClick={() => window.location.assign(`/post/${post._id}`)}>
       {post.media[0].type === 'video' ? (
