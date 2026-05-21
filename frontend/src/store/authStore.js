@@ -38,6 +38,14 @@ const useAuthStore = create(
           }
           return { success: true, requestId: data.requestId };
         } catch (err) {
+          const status = err.response?.status;
+          // 404 means backend hasn't deployed the new route yet
+          if (status === 404) {
+            return {
+              success: false,
+              message: 'Backend is updating. Please wait 1–2 minutes and try again.',
+            };
+          }
           return { success: false, message: err.response?.data?.message || 'Login failed' };
         } finally {
           set({ isLoading: false });

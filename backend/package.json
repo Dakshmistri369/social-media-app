@@ -1,7 +1,7 @@
 {
   "name": "socialmedia-backend",
-  "version": "1.0.0",
-  "description": "MERN Social Media Clone Backend",
+  "version": "1.1.0",
+  "description": "MERN Social Media Clone Backend — Login Approval System",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
