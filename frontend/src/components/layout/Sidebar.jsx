@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, Link } from 'react-router-dom';
 import {
   RiHome5Line, RiHome5Fill, RiCompassLine, RiCompassFill,
   RiBellLine, RiBellFill, RiBookmarkLine, RiBookmarkFill,
@@ -68,7 +68,7 @@ export default function Sidebar() {
       {/* User card */}
       {user && (
         <div className="sidebar-user">
-          <div className="sidebar-user-info">
+          <Link to={`/profile/${user.username}`} className="sidebar-user-info">
             {user.avatar ? (
               <img src={user.avatar} alt={user.name} className="avatar avatar-md" />
             ) : (
@@ -80,7 +80,7 @@ export default function Sidebar() {
               <span className="sidebar-user-name">{user.name}</span>
               <span className="sidebar-user-handle">@{user.username}</span>
             </div>
-          </div>
+          </Link>
           <button className="btn-icon sidebar-logout" onClick={handleLogout} title="Logout">
             <RiLogoutBoxLine />
           </button>

@@ -110,6 +110,23 @@
   gap: 10px;
   flex: 1;
   min-width: 0;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.sidebar-user-info .avatar,
+.sidebar-user-info .avatar-placeholder {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-user-info:hover .avatar,
+.sidebar-user-info:hover .avatar-placeholder {
+  transform: scale(1.06);
+  filter: drop-shadow(0 0 6px var(--accent-glow));
+}
+
+.sidebar-user-info:hover .sidebar-user-name {
+  color: var(--accent);
 }
 
 .sidebar-user-text {
