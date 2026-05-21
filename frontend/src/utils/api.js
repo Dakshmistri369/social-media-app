@@ -32,9 +32,47 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
-// Global 401 handler — redirect to login except on auth pages
+const SERVER_URL = isLocalhost ? 'http://localhost:5000' : 'https://backend-three-navy-33.vercel.app';
+
+const normalizeAssets = (obj) => {
+  if (!obj) return obj;
+  if (typeof obj === 'string') {
+    if (obj.startsWith('/uploads/')) {
+      return `${SERVER_URL}${obj}`;
+    }
+    return obj;
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(normalizeAssets);
+  }
+  if (typeof obj === 'object') {
+    if (
+      (typeof File !== 'undefined' && obj instanceof File) ||
+      (typeof Blob !== 'undefined' && obj instanceof Blob) ||
+      obj instanceof Date ||
+      obj.constructor?.name === 'FormData'
+    ) {
+      return obj;
+    }
+    const res = {};
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        res[key] = normalizeAssets(obj[key]);
+      }
+    }
+    return res;
+  }
+  return obj;
+};
+
+// Global response interceptor for normalizations and 401 handling
 API.interceptors.response.use(
-  (res) => res,
+  (res) => {
+    if (res.data) {
+      res.data = normalizeAssets(res.data);
+    }
+    return res;
+  },
   (err) => {
     const isAuthRoute = ['/login', '/register'].some((p) =>
       window.location.pathname.startsWith(p)

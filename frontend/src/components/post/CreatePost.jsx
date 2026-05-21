@@ -148,11 +148,11 @@ export default function CreatePost() {
           {focused && (
             <div className="create-post-toolbar">
               <div className="toolbar-left">
-                <div {...getRootProps()}>
+                <div {...getRootProps()} style={{ display: 'inline-block', outline: 'none' }}>
                   <input {...getInputProps()} />
-                  <button className="toolbar-btn" type="button">
+                  <div className="toolbar-btn" role="button">
                     <RiImageLine /> MEDIA
-                  </button>
+                  </div>
                 </div>
                 <button className="toolbar-btn sync-btn" type="button">
                   <RiGlobalLine /> SYNC

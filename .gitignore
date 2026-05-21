@@ -44,3 +44,7 @@ desktop.ini
 .vite/
 
 .vercel
+
+# ── Local uploads ─────────────────────
+backend/uploads/
+uploads/
