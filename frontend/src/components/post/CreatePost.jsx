@@ -139,10 +139,7 @@ export default function CreatePost() {
   };
 
   const handleAiImprove = async () => {
-    if (!content.trim()) {
-      toast.error('Write a quick draft first so the AI knows what to refine!');
-      return;
-    }
+    const isNewGenerated = !content.trim();
     setIsAiLoading(true);
     try {
       const { data } = await API.post('/posts/ai-caption', {
@@ -151,10 +148,10 @@ export default function CreatePost() {
       });
       if (data.success) {
         setContent(data.caption);
-        toast.success('Caption improved by AI! ✨');
+        toast.success(isNewGenerated ? 'AI post generated! ✨' : 'Caption improved by AI! ✨');
         setShowAiPopover(false);
       } else {
-        toast.error('AI refinement failed');
+        toast.error('AI generation failed');
       }
     } catch (err) {
       toast.error(err.response?.data?.message || 'AI service unavailable');

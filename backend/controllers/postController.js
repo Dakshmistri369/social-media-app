@@ -268,22 +268,36 @@ exports.searchPosts = async (req, res) => {
 
 // @POST /api/posts/ai-caption
 exports.generateAICaption = async (req, res) => {
-  try {
-    const { prompt, tone } = req.body;
-    if (!prompt) {
-      return res.status(400).json({ success: false, message: 'Draft prompt is required' });
-    }
+  let { prompt, tone } = req.body;
+  const isEmpty = !prompt || prompt.trim() === '';
+  
+  if (isEmpty) {
+    prompt = 'Create a random status update about coding, building projects, or dev life.';
+  }
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      // Fallback response for local development without a key
-      const tones = {
-        professional: `Here is a refined version of your draft: "${prompt}". Looking forward to sharing this with the community. #networking #business`,
-        funny: `So, I was thinking about: "${prompt}" and honestly, it's pretty funny. 😂 #lol #relatable`,
-        cyberpunk: `[SYSTEM UPDATE] Draft processed: "${prompt}". Cyber-grid synced. 🌐⚡ #cyberpunk #neon #loopix`,
-        sarcastic: `Oh, look at this masterpiece: "${prompt}". Groundbreaking. 🙄 #sarcasm #insightful`
+  const getLocalFallback = (p, t) => {
+    if (isEmpty) {
+      const starters = {
+        professional: "Excited to share that I'm refactoring our core microservices today. Constant optimization pays off! 💻📈 #building #scaling",
+        funny: "Spent 3 hours writing a script to automate a task that takes 5 seconds. Modern developer problems. 😂🤖 #programming #life",
+        cyberpunk: "[SYSTEM TRIGGER] Grid sync complete. Overclocking database nodes in the dark room. 🌐⚡ #cyberpunk #neon #loopix",
+        sarcastic: "Nothing says productivity like a 90-minute meeting to discuss the next meeting. Brilliant. 🙄👔 #worklife #agile"
       };
-      const text = tones[tone?.toLowerCase()] || `Refined draft: "${prompt}". #loopix #social`;
+      return starters[t?.toLowerCase()] || "Coding away on some exciting new app updates. Stay tuned! 🚀💻 #build #loopix";
+    }
+    const tones = {
+      professional: `Here is a refined version of your draft: "${p}". Looking forward to sharing this with the community. #networking #business`,
+      funny: `So, I was thinking about: "${p}" and honestly, it's pretty funny. 😂 #lol #relatable`,
+      cyberpunk: `[SYSTEM UPDATE] Draft processed: "${p}". Cyber-grid synced. 🌐⚡ #cyberpunk #neon #loopix`,
+      sarcastic: `Oh, look at this masterpiece: "${p}". Groundbreaking. 🙄 #sarcasm #insightful`
+    };
+    return tones[t?.toLowerCase()] || `Refined draft: "${p}". #loopix #social`;
+  };
+
+  try {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey || apiKey.trim() === '' || apiKey.includes('YOUR_') || apiKey.includes('change_me')) {
+      const text = getLocalFallback(prompt, tone);
       return res.json({ success: true, caption: text });
     }
 
@@ -291,7 +305,13 @@ exports.generateAICaption = async (req, res) => {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-    const systemPrompt = `You are a social media post assistant for a platform called Loopix. Loopix is a modern, dark-themed, premium tech-focused social media app. 
+    const systemPrompt = isEmpty
+      ? `You are a social media post assistant for a platform called Loopix. Loopix is a modern, dark-themed, premium tech-focused social media app.
+Your task is to generate a short, engaging, and catchy random status update / post about developer life, technology, programming, or coding.
+The user wants the tone of this generated post to be: "${tone || 'casual'}".
+Additionally, append 2-3 relevant hashtags at the very end of the post.
+Output ONLY the generated post content. Do not include any intros, titles, quotes or explanations.`
+      : `You are a social media post assistant for a platform called Loopix. Loopix is a modern, dark-themed, premium tech-focused social media app. 
 Your task is to take the user's post draft and rewrite it to make it engaging, clean, and catchy.
 The user wants the tone to be: "${tone || 'casual'}".
 Additionally, append 2-3 relevant hashtags at the very end of the post.
@@ -299,14 +319,16 @@ Output ONLY the generated post content. Do not include any intros, titles, quote
 
     const result = await model.generateContent([
       systemPrompt,
-      `User's Post Draft: ${prompt}`
+      isEmpty ? "Generate status now." : `User's Post Draft: ${prompt}`
     ]);
     const response = await result.response;
     const text = response.text().trim();
 
     res.json({ success: true, caption: text });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('Gemini API Error, falling back to local processing:', err.message);
+    const text = getLocalFallback(prompt, tone);
+    res.json({ success: true, caption: text, note: 'fallback active due to API issue' });
   }
 };
 
