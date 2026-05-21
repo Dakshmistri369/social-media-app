@@ -45,6 +45,7 @@ exports.uploadMedia = async (req, res) => {
         const result = await uploadToCloudinary(file.data, {
           folder: 'social-media/posts',
           resource_type: isVideo ? 'video' : 'image',
+          transformation: isVideo ? [] : [{ width: 1080, crop: 'limit' }],
           quality: 'auto',
           fetch_format: 'auto',
         });

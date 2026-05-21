@@ -54,6 +54,13 @@
   --sidebar-width:       220px;
   --right-sidebar-width: 300px;
   --topbar-height:       56px;
+
+  /* ── Glassmorphism (Dynamic Design System) ───── */
+  --bg-glass:      rgba(15, 20, 18, 0.65);
+  --blur-sm:       blur(8px);
+  --blur-md:       blur(16px);
+  --blur-lg:       blur(24px);
+  --shadow-card:   0 8px 32px 0 rgba(0, 0, 0, 0.45);
 }
 
 /* ── Reset ────────────────────────────────────────── */
@@ -423,3 +430,56 @@ textarea.input { resize: vertical; min-height: 80px; }
   .sidebar { transform: translateX(-100%); }
   .mobile-nav { display: flex !important; }
 }
+
+/* ── Mobile Layout Optimization & Best Resolutions ── */
+@media (max-width: 480px) {
+  :root {
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+  }
+  
+  body {
+    font-size: 14px;
+  }
+
+  .feed-layout {
+    padding: 0 8px;
+    padding-top: 8px;
+  }
+
+  .post-card-inner {
+    padding: 12px 12px 10px;
+  }
+
+  .post-media-wrap {
+    margin: 0 -12px 10px;
+  }
+
+  .create-post {
+    padding: 12px;
+  }
+
+  .avatar-md {
+    width: 36px;
+    height: 36px;
+  }
+
+  .btn {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+}
+
+/* ── High-Resolution (Retina) Screens Optimization ── */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  
+  .card, .post-card, .trending-tags, .user-search-card, .comment-bubble, .explore-search {
+    border-width: 0.5px !important;
+  }
+}
+

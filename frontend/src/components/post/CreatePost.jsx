@@ -7,6 +7,7 @@ import {
 import useAuthStore from '../../store/authStore';
 import usePostStore from '../../store/postStore';
 import API from '../../utils/api';
+import { compressImage } from '../../utils/imageCompressor';
 import toast from 'react-hot-toast';
 import './CreatePost.css';
 
@@ -56,7 +57,22 @@ export default function CreatePost() {
       let uploadedMedia = [];
       if (mediaFiles.length > 0) {
         const formData = new FormData();
-        mediaFiles.forEach((f) => formData.append('media', f));
+        
+        // Compress images client-side before sending to optimize resolution and size
+        for (const file of mediaFiles) {
+          if (file.type.startsWith('image/')) {
+            try {
+              const compressed = await compressImage(file, 1200, 1200, 0.8);
+              formData.append('media', compressed);
+            } catch (err) {
+              console.error('Image compression failed, using original file:', err);
+              formData.append('media', file);
+            }
+          } else {
+            formData.append('media', file);
+          }
+        }
+
         const { data } = await API.post('/upload/media', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });

@@ -3,6 +3,7 @@ import { RiCloseLine, RiImageLine } from 'react-icons/ri';
 import { useDropzone } from 'react-dropzone';
 import useAuthStore from '../../store/authStore';
 import API from '../../utils/api';
+import { compressImage } from '../../utils/imageCompressor';
 import toast from 'react-hot-toast';
 import './EditProfileModal.css';
 
@@ -24,9 +25,20 @@ export default function EditProfileModal({ user, onClose, onSave }) {
     maxFiles: 1,
     onDrop: async (files) => {
       if (!files[0]) return;
-      setAvatarPreview(URL.createObjectURL(files[0]));
+      
+      let uploadFile = files[0];
+      if (uploadFile.type.startsWith('image/')) {
+        try {
+          // Compress avatar to an optimal mobile square resolution (400x400 px)
+          uploadFile = await compressImage(uploadFile, 400, 400, 0.85);
+        } catch (err) {
+          console.error('Avatar compression failed, uploading original:', err);
+        }
+      }
+
+      setAvatarPreview(URL.createObjectURL(uploadFile));
       const formData = new FormData();
-      formData.append('avatar', files[0]);
+      formData.append('avatar', uploadFile);
       try {
         const { data } = await API.post('/upload/avatar', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
