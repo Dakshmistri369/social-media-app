@@ -2,6 +2,8 @@ const Post = require('../models/Post');
 const Comment = require('../models/Comment');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
+const Conversation = require('../models/Conversation');
+const Message = require('../models/Message');
 
 // @GET /api/posts/feed
 exports.getFeed = async (req, res) => {
@@ -179,6 +181,61 @@ exports.likePost = async (req, res) => {
           message: `${req.user.username} liked your post`,
         });
         req.io?.emit('notification', { recipient: post.author });
+
+        // Auto-create DM / conversation when a user likes another user's post
+        try {
+          let conversation = await Conversation.findOne({
+            participants: { $all: [userId, post.author] }
+          });
+
+          if (!conversation) {
+            conversation = new Conversation({
+              participants: [userId, post.author]
+            });
+            await conversation.save();
+          }
+
+          const postTextPreview = post.content ? `"${post.content.substring(0, 30)}${post.content.length > 30 ? '...' : ''}"` : 'your post';
+          const dmText = `Liked your post: ${postTextPreview}`;
+
+          const message = new Message({
+            conversation: conversation._id,
+            sender: userId,
+            text: dmText,
+            mediaUrl: '',
+            mediaType: 'none'
+          });
+
+          await message.save();
+
+          conversation.lastMessage = message._id;
+          await conversation.save();
+
+          const populatedMessage = await Message.findById(message._id)
+            .populate('sender', 'name username avatar')
+            .exec();
+
+          // Emit real-time message to the recipient and sender
+          const recipientSocketId = req.onlineUsers?.get(post.author.toString());
+          if (recipientSocketId) {
+            req.io?.to(recipientSocketId).emit('newMessage', populatedMessage);
+            req.io?.to(recipientSocketId).emit('conversationUpdated', {
+              conversationId: conversation._id,
+              lastMessage: populatedMessage
+            });
+          }
+
+          const senderSocketId = req.onlineUsers?.get(userId.toString());
+          if (senderSocketId) {
+            req.io?.to(senderSocketId).emit('newMessage', populatedMessage);
+            req.io?.to(senderSocketId).emit('conversationUpdated', {
+              conversationId: conversation._id,
+              lastMessage: populatedMessage
+            });
+          }
+        } catch (dmErr) {
+          console.error('Error creating DM on post like:', dmErr.message);
+        }
       }
     }
 
