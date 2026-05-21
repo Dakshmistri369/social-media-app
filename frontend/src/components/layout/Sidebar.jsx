@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import {
   RiHome5Line, RiHome5Fill, RiCompassLine, RiCompassFill,
   RiBellLine, RiBellFill, RiBookmarkLine, RiBookmarkFill,
-  RiUser3Line, RiUser3Fill, RiLogoutBoxLine, RiFlashlightFill,
+  RiUser3Line, RiUser3Fill, RiLogoutBoxLine,
 } from 'react-icons/ri';
 import useAuthStore from '../../store/authStore';
 import './Sidebar.css';
@@ -27,10 +27,8 @@ export default function Sidebar() {
     <aside className="sidebar">
       {/* Logo */}
       <div className="sidebar-logo">
-        <div className="logo-icon">
-          <RiFlashlightFill />
-        </div>
-        <span className="logo-text">SocialSphere</span>
+        <img src="/loopix-logo.svg" alt="Loopix" className="logo-img" />
+        <span className="logo-text">Loopix</span>
       </div>
 
       {/* Nav */}

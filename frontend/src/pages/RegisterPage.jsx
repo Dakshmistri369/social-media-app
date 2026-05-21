@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { RiFlashlightFill, RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
+import { RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
 import useAuthStore from '../store/authStore';
 import toast from 'react-hot-toast';
 import './AuthPages.css';
@@ -17,7 +17,7 @@ export default function RegisterPage() {
     const result = await register(form.username, form.email, form.password, form.name);
     if (result.success) {
       navigate('/');
-      toast.success('Account created! Welcome to SocialSphere 🚀');
+      toast.success('Account created! Welcome to Loopix 🚀');
     } else {
       toast.error(result.message);
     }
@@ -31,8 +31,8 @@ export default function RegisterPage() {
 
       <div className="auth-card scale-in">
         <div className="auth-logo">
-          <div className="logo-icon"><RiFlashlightFill /></div>
-          <h1 className="auth-title gradient-text">SocialSphere</h1>
+          <img src="/loopix-logo.svg" alt="Loopix" className="auth-logo-img" />
+          <h1 className="auth-title gradient-text">Loopix</h1>
         </div>
         <p className="auth-subtitle">Join millions sharing their story.</p>
 

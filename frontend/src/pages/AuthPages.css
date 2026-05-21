@@ -91,17 +91,11 @@
   justify-content: center;
 }
 
-.logo-icon {
-  width: 46px;
-  height: 46px;
-  background: var(--accent-gradient);
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  color: white;
-  box-shadow: 0 4px 24px var(--accent-glow);
+.auth-logo-img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(62,198,224,0.6)) drop-shadow(0 0 20px rgba(139,92,246,0.5));
 }
 
 .auth-title {

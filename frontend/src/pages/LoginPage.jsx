@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { RiFlashlightFill, RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
+import { RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
 import useAuthStore from '../store/authStore';
 import toast from 'react-hot-toast';
 import './AuthPages.css';
@@ -30,10 +30,8 @@ export default function LoginPage() {
 
       <div className="auth-card scale-in">
         <div className="auth-logo">
-          <div className="logo-icon">
-            <RiFlashlightFill />
-          </div>
-          <h1 className="auth-title gradient-text">SocialSphere</h1>
+          <img src="/loopix-logo.svg" alt="Loopix" className="auth-logo-img" />
+          <h1 className="auth-title gradient-text">Loopix</h1>
         </div>
         <p className="auth-subtitle">Welcome back! Sign in to continue.</p>
 
