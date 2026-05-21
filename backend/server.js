@@ -146,7 +146,7 @@ app.get('/api/health', (req, res) => {
   const states = ['disconnected', 'connected', 'connecting', 'disconnecting'];
   res.json({
     status:  'OK',
-    message: 'SocialSphere API Running',
+    message: 'Loopix API Running',
     db:      states[mongoose.connection.readyState] || 'unknown',
     env:     process.env.NODE_ENV || 'not set',
     mongo_uri_set: !!process.env.MONGO_URI,
