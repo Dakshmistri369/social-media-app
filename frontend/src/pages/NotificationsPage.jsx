@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import { RiBellLine, RiCheckLine, RiHeart3Fill, RiChat3Line, RiUserAddLine, RiRepeatLine } from 'react-icons/ri';
+import { RiNotification3Line, RiCheckLine, RiHeart3Fill, RiChat3Line, RiUserAddLine, RiRepeatLine } from 'react-icons/ri';
 import useAuthStore from '../store/authStore';
 import API from '../utils/api';
 import './NotificationsPage.css';
@@ -12,7 +12,7 @@ const ICON_MAP = {
   follow: <RiUserAddLine style={{ color: '#10b981' }} />,
   repost: <RiRepeatLine style={{ color: '#10b981' }} />,
   reply: <RiChat3Line style={{ color: '#8b5cf6' }} />,
-  mention: <RiBellLine style={{ color: '#eab308' }} />,
+  mention: <RiNotification3Line style={{ color: '#eab308' }} />,
 };
 
 export default function NotificationsPage() {
@@ -72,7 +72,7 @@ export default function NotificationsPage() {
         <div className="notif-list">
           {notifications.length === 0 ? (
             <div className="empty-state">
-              <RiBellLine style={{ fontSize: 48, opacity: 0.3 }} />
+              <RiNotification3Line style={{ fontSize: 48, opacity: 0.3 }} />
               <h3>No notifications yet</h3>
               <p>When someone likes or comments on your posts, you'll see it here.</p>
             </div>
@@ -91,7 +91,7 @@ export default function NotificationsPage() {
                       {n.sender?.name?.charAt(0).toUpperCase()}
                     </div>
                   )}
-                  <span className="notif-type-icon">{ICON_MAP[n.type] || <RiBellLine />}</span>
+                  <span className="notif-type-icon">{ICON_MAP[n.type] || <RiNotification3Line />}</span>
                 </div>
 
                 <div className="notif-content">

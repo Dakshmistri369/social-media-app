@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { NavLink, useNavigate, Link } from 'react-router-dom';
 import {
   RiHome5Line, RiHome5Fill, RiCompassLine, RiCompassFill,
-  RiBellLine, RiBellFill, RiBookmarkLine, RiBookmarkFill,
+  RiNotification3Line, RiNotification3Fill, RiBookmarkLine, RiBookmarkFill,
   RiUser3Line, RiUser3Fill, RiLogoutBoxLine, RiPaletteLine,
   RiMailLine, RiMailFill,
 } from 'react-icons/ri';
@@ -12,7 +12,7 @@ import './Sidebar.css';
 const navItems = [
   { to: '/', icon: <RiHome5Line />, activeIcon: <RiHome5Fill />, label: 'Home' },
   { to: '/explore', icon: <RiCompassLine />, activeIcon: <RiCompassFill />, label: 'Explore' },
-  { to: '/notifications', icon: <RiBellLine />, activeIcon: <RiBellFill />, label: 'Notifications' },
+  { to: '/notifications', icon: <RiNotification3Line />, activeIcon: <RiNotification3Fill />, label: 'Notifications' },
   { to: '/messages', icon: <RiMailLine />, activeIcon: <RiMailFill />, label: 'Messages' },
   { to: '/saved', icon: <RiBookmarkLine />, activeIcon: <RiBookmarkFill />, label: 'Saved' },
 ];
