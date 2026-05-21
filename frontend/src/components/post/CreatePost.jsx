@@ -102,7 +102,7 @@ export default function CreatePost() {
         <div className="create-post-input-area">
           <textarea
             className="create-post-textarea"
-            placeholder="What's happening? Share your thoughts..."
+            placeholder="Document a new growth or sync..."
             value={content}
             onChange={(e) => setContent(e.target.value)}
             onFocus={() => setFocused(true)}
@@ -135,23 +135,20 @@ export default function CreatePost() {
                 <div {...getRootProps()}>
                   <input {...getInputProps()} />
                   <button className="toolbar-btn" type="button">
-                    <RiImageLine />
+                    <RiImageLine /> MEDIA
                   </button>
                 </div>
-                <div {...getRootProps()}>
-                  <input {...getInputProps()} />
-                  <button className="toolbar-btn" type="button">
-                    <RiVideoLine />
-                  </button>
-                </div>
+                <button className="toolbar-btn sync-btn" type="button">
+                  <RiGlobalLine /> SYNC
+                </button>
                 <select
                   className="visibility-select"
                   value={visibility}
                   onChange={(e) => setVisibility(e.target.value)}
                 >
-                  <option value="public">🌍 Public</option>
-                  <option value="followers">👥 Followers</option>
-                  <option value="private">🔒 Only me</option>
+                  <option value="public">Public</option>
+                  <option value="followers">Followers</option>
+                  <option value="private">Only me</option>
                 </select>
               </div>
 
@@ -166,7 +163,7 @@ export default function CreatePost() {
                   onClick={handleSubmit}
                   disabled={isLoading || (!content.trim() && mediaFiles.length === 0)}
                 >
-                  {isLoading ? <div className="spinner" style={{ width: 16, height: 16, borderWidth: 2 }} /> : <><RiSendPlane2Fill /> Post</>}
+                  {isLoading ? <div className="spinner" style={{ width: 16, height: 16, borderWidth: 2 }} /> : 'PUBLISH'}
                 </button>
               </div>
             </div>

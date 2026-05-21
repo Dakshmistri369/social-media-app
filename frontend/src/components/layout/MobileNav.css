@@ -1,33 +1,53 @@
+/* ══════════════════════════════════════
+   MOBILE NAV — Dark Bio-Tech
+══════════════════════════════════════ */
 .mobile-nav {
   display: none;
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: var(--bg-glass);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  height: 64px;
+  background: #080d08;
   border-top: 1px solid var(--border);
-  padding: 10px 0;
   z-index: 200;
+  align-items: center;
   justify-content: space-around;
+  padding: 0 8px;
 }
 
 .mobile-nav-item {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
-  color: var(--text-muted);
+  gap: 4px;
   padding: 8px 20px;
-  border-radius: var(--radius-md);
-  transition: all 0.2s;
+  border-radius: var(--radius-full);
+  color: var(--text-muted);
+  font-size: 22px;
+  text-decoration: none;
+  transition: all 0.18s;
+  position: relative;
+}
+
+.mobile-nav-item span.nav-label {
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+
+.mobile-nav-item:hover {
+  color: var(--text-primary);
 }
 
 .mobile-nav-item.active {
-  color: var(--accent-light);
+  background: rgba(0,230,100,0.12);
+  color: var(--accent);
+  box-shadow: 0 0 12px rgba(0,230,100,0.15);
 }
 
 @media (max-width: 768px) {
-  .mobile-nav { display: flex !important; }
+  .mobile-nav { display: flex; }
 }

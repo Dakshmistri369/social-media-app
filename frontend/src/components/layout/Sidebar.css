@@ -1,6 +1,5 @@
 /* ══════════════════════════════════════
-   SIDEBAR — Loopix Navigation
-   Dark Glass UI · Teal Accent
+   SIDEBAR — Loopix Dark Bio-Tech
 ══════════════════════════════════════ */
 .sidebar {
   width: var(--sidebar-width);
@@ -10,42 +9,42 @@
   top: 0;
   display: flex;
   flex-direction: column;
-  background: #0d0d0d;
-  border-right: 1px solid rgba(255,255,255,0.07);
+  background: #080d08;
+  border-right: 1px solid var(--border);
   padding: 16px 10px;
   z-index: 100;
   gap: 4px;
 }
 
-/* ── Logo ───────────────────────────── */
+/* Logo */
 .sidebar-logo {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
-  margin-bottom: 16px;
+  padding: 10px 14px;
+  margin-bottom: 20px;
 }
 
 .logo-img {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   object-fit: contain;
   flex-shrink: 0;
-  filter: drop-shadow(0 0 6px rgba(0,188,212,0.7));
+  filter: drop-shadow(0 0 6px rgba(0,230,100,0.7));
 }
 
 .logo-text {
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 700;
   color: #ffffff;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.5px;
 }
 
-/* ── Nav ────────────────────────────── */
+/* Nav */
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   flex: 1;
 }
 
@@ -53,27 +52,25 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 11px 16px;
-  border-radius: 10px;
-  color: rgba(255,255,255,0.55);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
   font-size: 15px;
   font-weight: 500;
   transition: all 0.18s ease;
-  position: relative;
   text-decoration: none;
   border: 1px solid transparent;
 }
 
 .sidebar-link:hover {
-  background: rgba(255,255,255,0.06);
-  color: rgba(255,255,255,0.85);
+  background: rgba(0,230,100,0.06);
+  color: var(--text-primary);
 }
 
-/* Active — teal highlight, matching screenshot */
 .sidebar-link.active {
-  background: rgba(0, 188, 212, 0.18);
-  color: #00d4ea;
-  border: 1px solid rgba(0, 188, 212, 0.25);
+  background: rgba(0,230,100,0.12);
+  color: var(--accent);
+  border-color: rgba(0,230,100,0.18);
 }
 
 .sidebar-link-icon {
@@ -83,23 +80,18 @@
   flex-shrink: 0;
 }
 
-.sidebar-link-label {
-  flex: 1;
-  line-height: 1;
-}
-
-/* hide active pill dot — not in screenshot */
+.sidebar-link-label { flex: 1; }
 .active-pill { display: none; }
 
-/* ── User Card ──────────────────────── */
+/* User card */
 .sidebar-user {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   margin-top: auto;
 }
 
@@ -120,29 +112,30 @@
 .sidebar-user-name {
   font-size: 13px;
   font-weight: 600;
-  color: #f0f0f0;
+  color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .sidebar-user-handle {
-  font-size: 12px;
-  color: rgba(255,255,255,0.35);
+  font-size: 11px;
+  color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .sidebar-logout {
-  color: rgba(255,255,255,0.30);
-  border-radius: 8px;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
   flex-shrink: 0;
   transition: all 0.2s;
 }
 .sidebar-logout:hover {
-  color: #ef4444;
-  background: rgba(239,68,68,0.10);
+  color: var(--red);
+  background: rgba(255,68,68,0.10);
 }
 
 @media (max-width: 768px) {
