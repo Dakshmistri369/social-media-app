@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { RiAddLine, RiCloseLine, RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
 import API from '../../utils/api';
 import useAuthStore from '../../store/authStore';
+import { compressImage } from '../../utils/imageCompressor';
 import toast from 'react-hot-toast';
 import './Stories.css';
 
@@ -32,13 +33,33 @@ export default function Stories() {
   };
 
   const handleFileChange = async (e) => {
-    const file = e.target.files?.[0];
+    let file = e.target.files?.[0];
     if (!file) return;
+
+    // Check size first to avoid unnecessary processing on huge files
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('File is too large. Max file size is 10MB.');
+      return;
+    }
 
     setIsUploading(true);
     const toastId = toast.loading('Uploading story...');
 
     try {
+      // Compress image client-side to keep it small (~100-300KB)
+      if (file.type.startsWith('image/')) {
+        try {
+          file = await compressImage(file, 1080, 1920, 0.75); // Optimized for mobile/desktop story aspect ratios
+        } catch (compressErr) {
+          console.error('Image compression failed, using original file:', compressErr);
+        }
+      }
+
+      // Check against Vercel's 4.5MB request payload limit
+      if (file.size > 4.5 * 1024 * 1024) {
+        throw new Error('File is too large for production. Must be under 4MB.');
+      }
+
       // 1. Upload to media endpoint
       const formData = new FormData();
       formData.append('media', file);
@@ -64,7 +85,8 @@ export default function Stories() {
         fetchStories();
       }
     } catch (err) {
-      toast.error('Failed to post story', { id: toastId });
+      const errMsg = err.response?.data?.message || err.message || 'Failed to post story';
+      toast.error(errMsg, { id: toastId });
     } finally {
       setIsUploading(false);
     }
