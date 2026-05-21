@@ -39,12 +39,16 @@ const useAuthStore = create(
           return { success: true, requestId: data.requestId };
         } catch (err) {
           const status = err.response?.status;
-          // 404 means backend hasn't deployed the new route yet
+          // 404 = backend hasn't deployed the new route yet → fall back to direct login
           if (status === 404) {
-            return {
-              success: false,
-              message: 'Backend is updating. Please wait 1–2 minutes and try again.',
-            };
+            try {
+              const { data } = await API.post('/auth/login', { email, password });
+              localStorage.setItem('token', data.token);
+              set({ user: data.user, token: data.token, isAuthenticated: true });
+              return { success: true, direct: true };
+            } catch (fallbackErr) {
+              return { success: false, message: fallbackErr.response?.data?.message || 'Login failed' };
+            }
           }
           return { success: false, message: err.response?.data?.message || 'Login failed' };
         } finally {
