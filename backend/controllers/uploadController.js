@@ -57,20 +57,37 @@ exports.uploadMedia = async (req, res) => {
       return res.json({ success: true, media: uploaded });
     }
 
-    // ── Fallback: local filesystem (dev only, won't persist on Vercel) ───────
-    const path = require('path');
-    const fs   = require('fs');
-    const uploaded = [];
-    const uploadDir = path.join(__dirname, '..', 'uploads');
-    if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+    // ── Fallback: local filesystem with base64 fallback (for Vercel serverless) ───
+    const isServerless = process.env.VERCEL === '1';
+    if (!isServerless) {
+      try {
+        const path = require('path');
+        const fs   = require('fs');
+        const uploaded = [];
+        const uploadDir = path.join(__dirname, '..', 'uploads');
+        if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
+        for (const file of files) {
+          const ext = path.extname(file.name);
+          const filename = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}${ext}`;
+          const filepath = path.join(uploadDir, filename);
+          await file.mv(filepath);
+          const isVideo = ['.mp4', '.mov', '.avi', '.webm'].includes(ext.toLowerCase());
+          uploaded.push({ url: `/uploads/${filename}`, type: isVideo ? 'video' : 'image' });
+        }
+        return res.json({ success: true, media: uploaded });
+      } catch (fsErr) {
+        console.warn('Local filesystem upload failed, falling back to base64:', fsErr.message);
+      }
+    }
+
+    // Serverless or filesystem failure fallback: base64 data URIs
+    const uploaded = [];
     for (const file of files) {
-      const ext = path.extname(file.name);
-      const filename = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}${ext}`;
-      const filepath = path.join(uploadDir, filename);
-      await file.mv(filepath);
-      const isVideo = ['.mp4', '.mov', '.avi', '.webm'].includes(ext.toLowerCase());
-      uploaded.push({ url: `/uploads/${filename}`, type: isVideo ? 'video' : 'image' });
+      uploaded.push({
+        url: `data:${file.mimetype};base64,${file.data.toString('base64')}`,
+        type: file.mimetype.startsWith('video/') ? 'video' : 'image',
+      });
     }
     return res.json({ success: true, media: uploaded });
   } catch (err) {
@@ -104,15 +121,28 @@ exports.uploadAvatar = async (req, res) => {
       return res.json({ success: true, url });
     }
 
-    // ── Fallback: local filesystem ────────────────────────────────────────────
-    const path = require('path');
-    const fs   = require('fs');
-    const ext  = require('path').extname(file.name);
-    const filename = `avatar-${req.user._id}${ext}`;
-    const uploadDir = path.join(__dirname, '..', 'uploads', 'avatars');
-    if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-    await file.mv(path.join(uploadDir, filename));
-    const url = `/uploads/avatars/${filename}`;
+    // ── Fallback: local filesystem with base64 fallback ────────────────────────────
+    const isServerless = process.env.VERCEL === '1';
+    if (!isServerless) {
+      try {
+        const path = require('path');
+        const fs   = require('fs');
+        const ext  = require('path').extname(file.name);
+        const filename = `avatar-${req.user._id}${ext}`;
+        const uploadDir = path.join(__dirname, '..', 'uploads', 'avatars');
+        if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+        await file.mv(path.join(uploadDir, filename));
+        const url = `/uploads/avatars/${filename}`;
+        const User = require('../models/User');
+        await User.findByIdAndUpdate(req.user._id, { avatar: url });
+        return res.json({ success: true, url });
+      } catch (fsErr) {
+        console.warn('Local filesystem avatar upload failed, falling back to base64:', fsErr.message);
+      }
+    }
+
+    // Serverless or filesystem failure fallback: base64 data URI
+    const url = `data:${file.mimetype};base64,${file.data.toString('base64')}`;
     const User = require('../models/User');
     await User.findByIdAndUpdate(req.user._id, { avatar: url });
     return res.json({ success: true, url });
