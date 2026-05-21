@@ -204,7 +204,7 @@ export default function PostCard({ post, onDelete }) {
             <div className="poll-options">
               {poll.options.map((opt) => {
                 const totalVotes = poll.options.reduce((sum, o) => sum + o.votes.length, 0);
-                const isVoted = opt.votes.includes(user?._id);
+                const isVoted = opt.votes.some(v => v === user?._id || v?._id === user?._id);
                 const percentage = totalVotes > 0 ? Math.round((opt.votes.length / totalVotes) * 100) : 0;
                 
                 return (

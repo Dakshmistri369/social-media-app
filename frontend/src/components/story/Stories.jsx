@@ -84,7 +84,7 @@ export default function Stories() {
       let currentStep = 0;
 
       // Mark current story as viewed
-      const currentStory = groupedStories[activeUserIndex].stories[activeStoryIndex];
+      const currentStory = groupedStories[activeUserIndex]?.stories?.[activeStoryIndex];
       if (currentStory) {
         API.put(`/stories/${currentStory._id}/view`).catch(() => {});
       }
