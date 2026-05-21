@@ -9,7 +9,7 @@ const generateToken = (id) =>
   });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// @POST /api/auth/register
+// @POST /api/auth/register  (direct — admin bypass only)
 // ─────────────────────────────────────────────────────────────────────────────
 exports.register = async (req, res) => {
   try {
@@ -27,6 +27,72 @@ exports.register = async (req, res) => {
     const user = await User.create({ username, email, password, name });
     const token = generateToken(user._id);
     res.status(201).json({ success: true, token, user });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// @POST /api/auth/register-request
+// Creates the user account immediately but returns a requestId instead of a
+// token. The account is "pending" until the admin approves the LoginRequest.
+// ─────────────────────────────────────────────────────────────────────────────
+exports.requestRegister = async (req, res) => {
+  try {
+    const { username, email, password, name } = req.body;
+    if (!username || !email || !password || !name)
+      return res.status(400).json({ success: false, message: 'All fields are required' });
+    if (password.length < 6)
+      return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
+
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    if (existingUser)
+      return res.status(400).json({
+        success: false,
+        message: existingUser.email === email ? 'Email already in use' : 'Username taken',
+      });
+
+    // Create the user account (normal flow — no token yet)
+    const user = await User.create({ username, email, password, name });
+
+    // Store password hash so we can issue token on approval
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // Remove any stale pending request for the same email
+    await LoginRequest.deleteMany({ email, status: 'pending' });
+
+    const loginReq = await LoginRequest.create({
+      email,
+      name: user.name,
+      username: user.username,
+      passwordHash,
+      userId: user._id,
+      ipAddress: req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '',
+      userAgent: req.headers['user-agent'] || '',
+    });
+
+    // Notify admin via Socket.io
+    const adminUser = await User.findOne({ role: 'admin' });
+    if (adminUser && req.io) {
+      const adminSocketId = req.onlineUsers?.get(adminUser._id.toString());
+      if (adminSocketId) {
+        req.io.to(adminSocketId).emit('loginRequest', {
+          requestId: loginReq._id,
+          email: user.email,
+          name: user.name,
+          username: user.username,
+          type: 'register',
+          userAgent: loginReq.userAgent,
+          createdAt: loginReq.createdAt,
+        });
+      }
+    }
+
+    res.status(201).json({
+      success: true,
+      requestId: loginReq._id,
+      message: 'Account created! Waiting for admin approval before you can sign in.',
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

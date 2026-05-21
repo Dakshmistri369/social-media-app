@@ -62,6 +62,31 @@ const useAuthStore = create(
         set({ user, token, isAuthenticated: true });
       },
 
+      // Submit a register request that needs admin approval
+      requestRegister: async (username, email, password, name) => {
+        set({ isLoading: true });
+        try {
+          const { data } = await API.post('/auth/register-request', { username, email, password, name });
+          return { success: true, requestId: data.requestId };
+        } catch (err) {
+          const status = err.response?.status;
+          // 404 = backend hasn't deployed the new route yet → fall back to direct register
+          if (status === 404) {
+            try {
+              const { data } = await API.post('/auth/register', { username, email, password, name });
+              localStorage.setItem('token', data.token);
+              set({ user: data.user, token: data.token, isAuthenticated: true });
+              return { success: true, direct: true };
+            } catch (fallbackErr) {
+              return { success: false, message: fallbackErr.response?.data?.message || 'Registration failed' };
+            }
+          }
+          return { success: false, message: err.response?.data?.message || 'Registration failed' };
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
       register: async (username, email, password, name) => {
         set({ isLoading: true });
         try {

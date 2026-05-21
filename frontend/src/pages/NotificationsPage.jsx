@@ -131,7 +131,21 @@ export default function NotificationsPage() {
                     {req.name?.charAt(0)?.toUpperCase() || '?'}
                   </div>
                   <div className="lr-info">
-                    <div className="lr-name">{req.name} <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>@{req.username}</span></div>
+                    <div className="lr-name">
+                    {req.name}
+                    <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}> @{req.username}</span>
+                    <span style={{
+                      marginLeft: 6,
+                      fontSize: 10,
+                      fontWeight: 700,
+                      padding: '2px 7px',
+                      borderRadius: 20,
+                      background: req.type === 'register' ? 'rgba(124,92,255,0.18)' : 'rgba(16,185,129,0.15)',
+                      color: req.type === 'register' ? 'var(--accent)' : '#10b981',
+                    }}>
+                      {req.type === 'register' ? 'Sign Up' : 'Sign In'}
+                    </span>
+                  </div>
                     <div className="lr-email">{req.email}</div>
                     <div className="lr-time">
                       {formatDistanceToNow(new Date(req.createdAt), { addSuffix: true })}

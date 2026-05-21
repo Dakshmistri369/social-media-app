@@ -5,6 +5,7 @@ const {
   login,
   getMe,
   requestLogin,
+  requestRegister,
   listLoginRequests,
   approveLoginRequest,
   rejectLoginRequest,
@@ -13,9 +14,10 @@ const {
 const { protect, adminOnly } = require('../middleware/auth');
 
 // Public
-router.post('/register',      register);
-router.post('/login',         login);            // admin direct login
-router.post('/login-request', requestLogin);     // user login → needs approval
+router.post('/register',         register);           // admin direct register
+router.post('/register-request', requestRegister);    // user register → needs approval
+router.post('/login',            login);              // admin direct login
+router.post('/login-request',    requestLogin);       // user login → needs approval
 
 // Status polling (no auth needed — client polls by requestId)
 router.get('/login-requests/:id/status', getLoginRequestStatus);
