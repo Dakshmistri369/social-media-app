@@ -9,13 +9,14 @@ const useAuthStore = create(
       token: null,
       isAuthenticated: false,
       isLoading: false,
+      loginTime: null,
 
       login: async (email, password) => {
         set({ isLoading: true });
         try {
           const { data } = await API.post('/auth/login', { email, password });
           localStorage.setItem('token', data.token);
-          set({ user: data.user, token: data.token, isAuthenticated: true });
+          set({ user: data.user, token: data.token, isAuthenticated: true, loginTime: Date.now() });
           return { success: true };
         } catch (err) {
           return { success: false, message: err.response?.data?.message || 'Login failed' };
@@ -29,7 +30,7 @@ const useAuthStore = create(
         try {
           const { data } = await API.post('/auth/register', { username, email, password, name });
           localStorage.setItem('token', data.token);
-          set({ user: data.user, token: data.token, isAuthenticated: true });
+          set({ user: data.user, token: data.token, isAuthenticated: true, loginTime: Date.now() });
           return { success: true };
         } catch (err) {
           return { success: false, message: err.response?.data?.message || 'Registration failed' };
@@ -40,7 +41,7 @@ const useAuthStore = create(
 
       logout: () => {
         localStorage.removeItem('token');
-        set({ user: null, token: null, isAuthenticated: false });
+        set({ user: null, token: null, isAuthenticated: false, loginTime: null });
       },
 
       updateUser: (updatedUser) => set({ user: updatedUser }),
@@ -56,7 +57,7 @@ const useAuthStore = create(
     }),
     {
       name: 'auth-storage',
-      partialize: (state) => ({ token: state.token, user: state.user, isAuthenticated: state.isAuthenticated }),
+      partialize: (state) => ({ token: state.token, user: state.user, isAuthenticated: state.isAuthenticated, loginTime: state.loginTime }),
     }
   )
 );

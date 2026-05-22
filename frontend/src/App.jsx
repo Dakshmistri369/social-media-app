@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
+import { Toaster, toast } from 'react-hot-toast';
 import { useEffect, lazy, Suspense } from 'react';
 import useAuthStore from './store/authStore';
 import { socket } from './utils/socket';
@@ -50,7 +50,34 @@ const AdminRoute = ({ children }) => {
 };
 
 export default function App() {
-  const { fetchMe, isAuthenticated, user } = useAuthStore();
+  const { fetchMe, isAuthenticated, user, loginTime, logout } = useAuthStore();
+
+  // 1-Hour Session Auto-Logout Check
+  useEffect(() => {
+    if (isAuthenticated) {
+      // For existing legacy sessions without a loginTime, initialize it now
+      if (!loginTime) {
+        useAuthStore.setState({ loginTime: Date.now() });
+        return;
+      }
+
+      const oneHour = 60 * 60 * 1000;
+      const timeElapsed = Date.now() - loginTime;
+
+      if (timeElapsed >= oneHour) {
+        toast.error('Your session has expired. Please log in again.');
+        logout();
+      } else {
+        const timeLeft = oneHour - timeElapsed;
+        const timer = setTimeout(() => {
+          toast.error('Your session has expired. Please log in again.');
+          logout();
+        }, timeLeft);
+
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isAuthenticated, loginTime, logout]);
 
   useEffect(() => {
     if (isAuthenticated) {
