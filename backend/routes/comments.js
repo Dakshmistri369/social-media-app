@@ -5,7 +5,7 @@ const {
 } = require('../controllers/commentController');
 const { protect } = require('../middleware/auth');
 
-router.get('/post/:postId', getComments);
+router.get('/post/:postId', protect, getComments);
 router.post('/post/:postId', protect, createComment);
 router.put('/:id/like', protect, likeComment);
 router.delete('/:id', protect, deleteComment);

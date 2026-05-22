@@ -7,14 +7,14 @@ const {
 const { protect, optionalAuth } = require('../middleware/auth');
 
 // Specific routes MUST come before wildcard /:id routes
-router.get('/feed', optionalAuth, getFeed);
-router.get('/explore', optionalAuth, getExplorePosts);
-router.get('/search', searchPosts);
+router.get('/feed', protect, getFeed);
+router.get('/explore', protect, getExplorePosts);
+router.get('/search', protect, searchPosts);
 router.post('/ai-caption', protect, generateAICaption);
 router.post('/', protect, createPost);
 
 // Wildcard routes (must be last)
-router.get('/:id', optionalAuth, getPost);
+router.get('/:id', protect, getPost);
 router.put('/:id', protect, updatePost);
 router.delete('/:id', protect, deletePost);
 router.put('/:id/like', protect, likePost);
