@@ -18,7 +18,11 @@ export default function MobileNav() {
   const handleNavClick = (to, e) => {
     if (window.location.pathname === to) {
       e.preventDefault();
-      window.location.reload();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const mainContent = document.querySelector('.main-content');
+      if (mainContent) {
+        mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
   };
 

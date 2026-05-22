@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { useInView } from 'react-intersection-observer';
 import { RiSearchLine, RiFireLine, RiHashtag } from 'react-icons/ri';
 import PostCard from '../components/post/PostCard';
@@ -267,7 +267,7 @@ export default function ExplorePage() {
 
 function ExploreMediaCard({ post }) {
   return (
-    <div className="explore-media-card" onClick={() => window.location.assign(`/post/${post._id}`)}>
+    <Link to={`/post/${post._id}`} className="explore-media-card">
       {post.media[0].type === 'video' ? (
         <video src={post.media[0].url} className="explore-media" />
       ) : (
@@ -277,13 +277,13 @@ function ExploreMediaCard({ post }) {
         <span>❤️ {post.likes?.length || 0}</span>
         <span>💬 {post.comments?.length || 0}</span>
       </div>
-    </div>
+    </Link>
   );
 }
 
 function UserSearchCard({ user }) {
   return (
-    <a href={`/profile/${user.username}`} className="user-search-card">
+    <Link to={`/profile/${user.username}`} className="user-search-card">
       {user.avatar ? (
         <img src={user.avatar} alt={user.name} className="avatar avatar-md" />
       ) : (
@@ -295,6 +295,6 @@ function UserSearchCard({ user }) {
         {user.bio && <p>{user.bio.substring(0, 60)}...</p>}
       </div>
       <span className="user-follower-count">{user.followers?.length || 0} followers</span>
-    </a>
+    </Link>
   );
 }

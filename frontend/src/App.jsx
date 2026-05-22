@@ -4,17 +4,16 @@ import { useEffect, lazy, Suspense } from 'react';
 import useAuthStore from './store/authStore';
 import { socket } from './utils/socket';
 
-// Lazy load pages for fast initial bundle loading and better performance
-const LoginPage = lazy(() => import('./pages/LoginPage'));
-const RegisterPage = lazy(() => import('./pages/RegisterPage'));
-const FeedPage = lazy(() => import('./pages/FeedPage'));
-const ExplorePage = lazy(() => import('./pages/ExplorePage'));
-const ProfilePage = lazy(() => import('./pages/ProfilePage'));
-const PostDetailPage = lazy(() => import('./pages/PostDetailPage'));
-const NotificationsPage = lazy(() => import('./pages/NotificationsPage'));
-const SavedPage = lazy(() => import('./pages/SavedPage'));
-const MessagesPage = lazy(() => import('./pages/MessagesPage'));
-const AdminPage = lazy(() => import('./pages/AdminPage'));
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import FeedPage from './pages/FeedPage';
+import ExplorePage from './pages/ExplorePage';
+import ProfilePage from './pages/ProfilePage';
+import PostDetailPage from './pages/PostDetailPage';
+import NotificationsPage from './pages/NotificationsPage';
+import SavedPage from './pages/SavedPage';
+import MessagesPage from './pages/MessagesPage';
+import AdminPage from './pages/AdminPage';
 
 // Layout
 import AppLayout from './components/layout/AppLayout';

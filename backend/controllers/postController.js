@@ -51,7 +51,7 @@ exports.getExplorePosts = async (req, res) => {
     if (tag) filter.hashtags = tag;
 
     const posts = await Post.find(filter)
-      .sort({ likes: -1, createdAt: -1 })
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .populate('author', 'username name avatar isVerified')
