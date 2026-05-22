@@ -1,6 +1,7 @@
 const jwt  = require('jsonwebtoken');
 const User = require('../models/User');
 const { validatePassword } = require('../utils/passwordValidator');
+const { hasAbusiveLanguage } = require('../utils/badWordsFilter');
 
 const generateToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -13,6 +14,14 @@ exports.register = async (req, res) => {
     const { username, email, password, name } = req.body;
     if (!username || !email || !password || !name)
       return res.status(400).json({ success: false, message: 'All fields are required' });
+
+    // Prevent registrations with abusive usernames, names, or emails
+    if (hasAbusiveLanguage(username) || hasAbusiveLanguage(name) || hasAbusiveLanguage(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Registration blocked: Abusive, profane, or inappropriate language is strictly prohibited.'
+      });
+    }
 
     // Validate password strength before registering
     const pwdCheck = validatePassword(password, { username, email, name });
@@ -45,6 +54,13 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password)
       return res.status(400).json({ success: false, message: 'Email and password required' });
+
+    if (hasAbusiveLanguage(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Login blocked: Abusive, profane, or inappropriate language is strictly prohibited.'
+      });
+    }
 
     const user = await User.findOne({ email }).select('+password');
     if (!user || !(await user.comparePassword(password)))

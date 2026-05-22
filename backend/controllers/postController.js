@@ -4,6 +4,7 @@ const User = require('../models/User');
 const Notification = require('../models/Notification');
 const Conversation = require('../models/Conversation');
 const Message = require('../models/Message');
+const { hasAbusiveLanguage } = require('../utils/badWordsFilter');
 
 // @GET /api/posts/feed
 exports.getFeed = async (req, res) => {
@@ -108,6 +109,14 @@ exports.createPost = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Post must have content, media, or a poll' });
     }
 
+    // Block posts containing abusive language
+    if (hasAbusiveLanguage(content)) {
+      return res.status(400).json({ success: false, message: 'Post content contains abusive, profane, or inappropriate language.' });
+    }
+    if (poll && (hasAbusiveLanguage(poll.question) || (Array.isArray(poll.options) && poll.options.some(o => hasAbusiveLanguage(o))))) {
+      return res.status(400).json({ success: false, message: 'Poll details contain abusive, profane, or inappropriate language.' });
+    }
+
     const extractedHashtags = (content || '').match(/#\w+/g)?.map(t => t.toLowerCase()) || [];
     const allHashtags = [...new Set([...(hashtags || []), ...extractedHashtags])];
 
@@ -135,6 +144,15 @@ exports.updatePost = async (req, res) => {
     if (post.author.toString() !== req.user._id.toString()) {
       return res.status(403).json({ success: false, message: 'Not authorized' });
     }
+
+    // Block updates containing abusive language
+    if (hasAbusiveLanguage(req.body.content)) {
+      return res.status(400).json({ success: false, message: 'Updated post content contains abusive, profane, or inappropriate language.' });
+    }
+    if (req.body.poll && (hasAbusiveLanguage(req.body.poll.question) || (Array.isArray(req.body.poll.options) && req.body.poll.options.some(o => hasAbusiveLanguage(o))))) {
+      return res.status(400).json({ success: false, message: 'Poll details contain abusive, profane, or inappropriate language.' });
+    }
+
     const updated = await Post.findByIdAndUpdate(req.params.id, req.body, { new: true })
       .populate('author', 'username name avatar isVerified');
     res.json({ success: true, post: updated });

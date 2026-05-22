@@ -1,6 +1,7 @@
 const Comment = require('../models/Comment');
 const Post = require('../models/Post');
 const Notification = require('../models/Notification');
+const { hasAbusiveLanguage } = require('../utils/badWordsFilter');
 
 // @GET /api/comments/post/:postId
 exports.getComments = async (req, res) => {
@@ -35,6 +36,11 @@ exports.createComment = async (req, res) => {
   try {
     const { content, parentComment } = req.body;
     if (!content) return res.status(400).json({ success: false, message: 'Content required' });
+
+    // Block comments containing abusive language
+    if (hasAbusiveLanguage(content)) {
+      return res.status(400).json({ success: false, message: 'Comment content contains abusive, profane, or inappropriate language.' });
+    }
 
     const post = await Post.findById(req.params.postId);
     if (!post) return res.status(404).json({ success: false, message: 'Post not found' });

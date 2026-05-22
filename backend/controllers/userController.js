@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Post = require('../models/Post');
 const Notification = require('../models/Notification');
+const { hasAbusiveLanguage } = require('../utils/badWordsFilter');
 
 // @GET /api/users/search
 exports.searchUsers = async (req, res) => {
@@ -74,6 +75,15 @@ exports.getUserPosts = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   try {
     const { name, bio, website, location, avatar, coverImage } = req.body;
+    
+    // Prevent abusive language in profile updates
+    if (hasAbusiveLanguage(name) || hasAbusiveLanguage(bio) || hasAbusiveLanguage(website) || hasAbusiveLanguage(location)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Profile update blocked: Abusive, profane, or inappropriate language is not allowed.' 
+      });
+    }
+
     const user = await User.findByIdAndUpdate(
       req.user._id,
       { name, bio, website, location, avatar, coverImage },

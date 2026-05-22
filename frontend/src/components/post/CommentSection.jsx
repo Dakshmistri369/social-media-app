@@ -4,6 +4,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { RiHeart3Line, RiHeart3Fill, RiReplyLine, RiCheckboxCircleFill, RiDeleteBin6Line } from 'react-icons/ri';
 import useAuthStore from '../../store/authStore';
 import API from '../../utils/api';
+import { hasAbusiveLanguage } from '../../utils/badWordsFilter';
 import toast from 'react-hot-toast';
 import './CommentSection.css';
 
@@ -113,6 +114,13 @@ export default function CommentSection({ postId }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;
+
+    // Block comments containing abusive language
+    if (hasAbusiveLanguage(newComment)) {
+      toast.error('Comment contains abusive, profane, or inappropriate language.');
+      return;
+    }
+
     setIsLoading(true);
     try {
       const { data } = await API.post(`/comments/post/${postId}`, {

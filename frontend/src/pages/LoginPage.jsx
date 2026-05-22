@@ -4,6 +4,7 @@ import { RiEyeLine, RiEyeOffLine, RiArrowRightLine, RiLockLine, RiMailLine, RiCh
 import useAuthStore from '../store/authStore';
 import toast from 'react-hot-toast';
 import { validatePassword } from '../utils/passwordValidator';
+import { hasAbusiveLanguage } from '../utils/badWordsFilter';
 import './AuthPages.css';
 
 export default function LoginPage() {
@@ -44,6 +45,10 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (hasAbusiveLanguage(form.email)) {
+      toast.error('Login blocked: Abusive, profane, or inappropriate language is strictly prohibited.');
+      return;
+    }
     if (!pwdCheck.isValid) {
       toast.error(pwdCheck.errors[0] || 'Password does not meet the strong password criteria');
       return;

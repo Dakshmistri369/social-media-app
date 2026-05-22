@@ -1,5 +1,6 @@
 const Story = require('../models/Story');
 const User = require('../models/User');
+const { hasAbusiveLanguage } = require('../utils/badWordsFilter');
 
 const getStories = async (req, res) => {
   try {
@@ -39,6 +40,11 @@ const createStory = async (req, res) => {
     const { mediaUrl, mediaType, caption } = req.body;
     if (!mediaUrl) {
       return res.status(400).json({ success: false, message: 'Media URL is required' });
+    }
+
+    // Block stories containing abusive language in caption
+    if (hasAbusiveLanguage(caption)) {
+      return res.status(400).json({ success: false, message: 'Story caption contains abusive, profane, or inappropriate language.' });
     }
 
     const newStory = new Story({

@@ -1,6 +1,7 @@
 const Conversation = require('../models/Conversation');
 const Message = require('../models/Message');
 const User = require('../models/User');
+const { hasAbusiveLanguage } = require('../utils/badWordsFilter');
 
 const sendMessage = async (req, res) => {
   try {
@@ -9,6 +10,11 @@ const sendMessage = async (req, res) => {
 
     if (!recipientId) {
       return res.status(400).json({ success: false, message: 'Recipient ID is required' });
+    }
+
+    // Block messages containing abusive language
+    if (hasAbusiveLanguage(text)) {
+      return res.status(400).json({ success: false, message: 'Message contains abusive, profane, or inappropriate language.' });
     }
 
     // 1. Find or create conversation

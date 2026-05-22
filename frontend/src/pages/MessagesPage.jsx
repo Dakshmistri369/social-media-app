@@ -7,6 +7,7 @@ import { socket } from '../utils/socket';
 import { formatDistanceToNow } from 'date-fns';
 import toast from 'react-hot-toast';
 import { getSharedKey, encryptMessage, decryptMessage } from '../utils/crypto';
+import { hasAbusiveLanguage } from '../utils/badWordsFilter';
 import './MessagesPage.css';
 
 export default function MessagesPage() {
@@ -139,6 +140,12 @@ export default function MessagesPage() {
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!text.trim() && !mediaFile) return;
+
+    // Block messages containing abusive language
+    if (hasAbusiveLanguage(text)) {
+      toast.error('Message contains abusive, profane, or inappropriate language.');
+      return;
+    }
 
     const recipient = activeConversation.participants.find((p) => p._id !== currentUser._id);
     if (!recipient) return;

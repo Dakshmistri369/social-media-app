@@ -4,6 +4,7 @@ import { useDropzone } from 'react-dropzone';
 import useAuthStore from '../../store/authStore';
 import API from '../../utils/api';
 import { compressImage } from '../../utils/imageCompressor';
+import { hasAbusiveLanguage } from '../../utils/badWordsFilter';
 import toast from 'react-hot-toast';
 import './EditProfileModal.css';
 
@@ -52,6 +53,10 @@ export default function EditProfileModal({ user, onClose, onSave }) {
   });
 
   const handleSave = async () => {
+    if (hasAbusiveLanguage(form.name) || hasAbusiveLanguage(form.bio) || hasAbusiveLanguage(form.website) || hasAbusiveLanguage(form.location)) {
+      toast.error('Profile details contain abusive, profane, or inappropriate language.');
+      return;
+    }
     setIsLoading(true);
     try {
       const { data } = await API.put('/users/profile/update', form);

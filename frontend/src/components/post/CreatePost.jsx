@@ -8,6 +8,7 @@ import useAuthStore from '../../store/authStore';
 import usePostStore from '../../store/postStore';
 import API from '../../utils/api';
 import { compressImage } from '../../utils/imageCompressor';
+import { hasAbusiveLanguage } from '../../utils/badWordsFilter';
 import toast from 'react-hot-toast';
 import './CreatePost.css';
 
@@ -78,6 +79,17 @@ export default function CreatePost() {
       toast.error('Write something, add media, or create a complete poll!');
       return;
     }
+
+    // Check for abusive language in posts
+    if (hasAbusiveLanguage(content)) {
+      toast.error('Post content contains abusive, profane, or inappropriate language.');
+      return;
+    }
+    if (hasPoll && (hasAbusiveLanguage(pollQuestion) || pollOptions.some(o => hasAbusiveLanguage(o)))) {
+      toast.error('Poll contains abusive, profane, or inappropriate language.');
+      return;
+    }
+
     setIsLoading(true);
     try {
       let uploadedMedia = [];
