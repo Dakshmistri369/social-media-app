@@ -13,7 +13,7 @@ exports.searchUsers = async (req, res) => {
         { username: { $regex: q, $options: 'i' } },
         { name: { $regex: q, $options: 'i' } },
       ],
-    }).select('username name avatar bio isVerified followers').limit(10);
+    }).select('username name avatar bio isVerified followers').limit(10).lean();
     res.json({ success: true, users });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -28,7 +28,8 @@ exports.getSuggestions = async (req, res) => {
       _id: { $nin: [...following, req.user._id] },
     })
       .select('username name avatar bio isVerified followers')
-      .limit(5);
+      .limit(5)
+      .lean();
     res.json({ success: true, users });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -62,7 +63,8 @@ exports.getUserPosts = async (req, res) => {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .populate('author', 'username name avatar isVerified');
+      .populate('author', 'username name avatar isVerified')
+      .lean();
 
     const total = await Post.countDocuments({ author: user._id, visibility: 'public' });
     res.json({ success: true, posts, pagination: { page, limit, total } });
@@ -142,7 +144,7 @@ exports.getSavedPosts = async (req, res) => {
       path: 'savedPosts',
       populate: { path: 'author', select: 'username name avatar isVerified' },
       options: { sort: { createdAt: -1 } },
-    });
+    }).lean();
     res.json({ success: true, posts: user.savedPosts });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

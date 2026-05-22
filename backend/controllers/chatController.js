@@ -78,7 +78,8 @@ const getConversations = async (req, res) => {
         path: 'lastMessage',
         populate: { path: 'sender', select: 'name username avatar' }
       })
-      .sort({ updatedAt: -1 });
+      .sort({ updatedAt: -1 })
+      .lean();
 
     res.json({ success: true, conversations });
   } catch (err) {
@@ -91,7 +92,8 @@ const getMessages = async (req, res) => {
     const { conversationId } = req.params;
     const messages = await Message.find({ conversation: conversationId })
       .populate('sender', 'name username avatar')
-      .sort({ createdAt: 1 });
+      .sort({ createdAt: 1 })
+      .lean();
 
     res.json({ success: true, messages });
   } catch (err) {

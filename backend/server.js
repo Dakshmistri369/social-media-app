@@ -14,6 +14,7 @@ const helmet     = require('helmet');
 const morgan     = require('morgan');
 const fileUpload = require('express-fileupload');
 const path       = require('path');
+const compression = require('compression');
 
 // ── Allowed origins (dev + production) ──────────────────────────────────────
 const ALLOWED_ORIGINS = [
@@ -86,6 +87,7 @@ const io = new Server(server, {
 app.use(helmet({ crossOriginResourcePolicy: false }));
 app.options('*', cors(corsOptions));   // preflight must be FIRST
 app.use(cors(corsOptions));
+app.use(compression());
 app.use(morgan('dev'));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));

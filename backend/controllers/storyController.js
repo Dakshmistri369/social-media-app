@@ -4,7 +4,7 @@ const { hasAbusiveLanguage } = require('../utils/badWordsFilter');
 
 const getStories = async (req, res) => {
   try {
-    const currentUser = await User.findById(req.user.id);
+    const currentUser = await User.findById(req.user.id).lean();
     if (!currentUser) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
@@ -14,7 +14,8 @@ const getStories = async (req, res) => {
 
     const stories = await Story.find({ user: { $in: followingAndMe } })
       .populate('user', 'name username avatar')
-      .sort({ createdAt: 1 });
+      .sort({ createdAt: 1 })
+      .lean();
 
     // Group stories by user
     const grouped = {};

@@ -20,7 +20,8 @@ exports.listUsers = async (req, res) => {
       .select('name username email avatar role isVerified followers following createdAt')
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
-      .limit(Number(limit));
+      .limit(Number(limit))
+      .lean();
 
     res.json({ success: true, users, total, page: Number(page), pages: Math.ceil(total / limit) });
   } catch (err) {

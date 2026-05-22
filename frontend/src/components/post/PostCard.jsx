@@ -22,14 +22,21 @@ const reactionsMap = {
 };
 
 export default function PostCard({ post, onDelete }) {
-  const { user } = useAuthStore();
+  const { user, updateUser } = useAuthStore();
   const { removePost } = usePostStore();
   const [reactions, setReactions] = useState(post.reactions || []);
   const [showReactionsSelector, setShowReactionsSelector] = useState(false);
   const [poll, setPoll] = useState(post.poll);
-  const [saved, setSaved] = useState(false);
+  const [saved, setSaved] = useState(() => {
+    if (!user || !user.savedPosts) return false;
+    return user.savedPosts.some(id => (id?._id || id) === post._id);
+  });
   const [showMenu, setShowMenu] = useState(false);
-  const [reposted, setReposted] = useState(false);
+  const [reposted, setReposted] = useState(() => {
+    if (!user || !post.shares) return false;
+    const userId = user._id || user.id;
+    return post.shares.some(id => (id?._id || id) === userId);
+  });
   const menuRef = useRef(null);
   const navigate = useNavigate();
 
@@ -37,6 +44,18 @@ export default function PostCard({ post, onDelete }) {
   const pressTimeoutRef = useRef(null);
   const isPressingRef = useRef(false);
   const preventClickRef = useRef(false);
+
+  // Sync saved and reposted states when user or post changes
+  useEffect(() => {
+    if (user) {
+      const userId = user._id || user.id;
+      setSaved(user.savedPosts ? user.savedPosts.some(id => (id?._id || id) === post._id) : false);
+      setReposted(post.shares ? post.shares.some(id => (id?._id || id) === userId) : false);
+    } else {
+      setSaved(false);
+      setReposted(false);
+    }
+  }, [user, post._id, post.shares]);
 
   // Clean up timeouts on unmount
   useEffect(() => {
@@ -177,23 +196,47 @@ export default function PostCard({ post, onDelete }) {
   const handleSave = async (e) => {
     e.stopPropagation();
     if (!user) { navigate('/login'); return; }
-    setSaved(!saved);
+    
+    const wasSaved = saved;
+    setSaved(!wasSaved);
+    
     try {
       await API.post(`/posts/${post._id}/save`);
-      toast.success(saved ? 'Removed from saved' : 'Post saved!');
+      if (user) {
+        const updatedSavedPosts = wasSaved
+          ? user.savedPosts.filter(id => (id?._id || id) !== post._id)
+          : [...(user.savedPosts || []), post._id];
+        updateUser({ ...user, savedPosts: updatedSavedPosts });
+      }
+      toast.success(wasSaved ? 'Removed from saved' : 'Post saved!');
     } catch {
-      setSaved(saved);
+      setSaved(wasSaved);
+      toast.error('Failed to save post');
     }
   };
 
   const handleRepost = async (e) => {
     e.stopPropagation();
     if (!user) { navigate('/login'); return; }
+    
+    const wasReposted = reposted;
+    setReposted(!wasReposted);
+    
     try {
       const { data } = await API.post(`/posts/${post._id}/repost`);
       setReposted(data.isReposted);
+      // Update local shares array on the post object to keep count in sync
+      const userId = user._id || user.id;
+      let newShares = [...(post.shares || [])];
+      if (data.isReposted) {
+        if (!newShares.includes(userId)) newShares.push(userId);
+      } else {
+        newShares = newShares.filter(id => id !== userId);
+      }
+      post.shares = newShares;
       toast.success(data.isReposted ? 'Reposted!' : 'Repost removed');
     } catch {
+      setReposted(wasReposted);
       toast.error('Failed to repost');
     }
   };

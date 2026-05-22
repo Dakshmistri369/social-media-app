@@ -10,7 +10,8 @@ exports.getNotifications = async (req, res) => {
       .skip(skip)
       .limit(limit)
       .populate('sender', 'username name avatar')
-      .populate('post', 'content media');
+      .populate('post', 'content media')
+      .lean();
     const unreadCount = await Notification.countDocuments({
       recipient: req.user._id,
       isRead: false,

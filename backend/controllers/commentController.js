@@ -22,7 +22,8 @@ exports.getComments = async (req, res) => {
         path: 'replies',
         populate: { path: 'author', select: 'username name avatar isVerified' },
         options: { limit: 3 },
-      });
+      })
+      .lean();
 
     const total = await Comment.countDocuments({ post: req.params.postId, parentComment: null });
     res.json({ success: true, comments, pagination: { page, limit, total } });
