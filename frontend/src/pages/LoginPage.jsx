@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { RiEyeLine, RiEyeOffLine, RiArrowRightLine, RiLockLine, RiMailLine } from 'react-icons/ri';
+import { RiEyeLine, RiEyeOffLine, RiArrowRightLine, RiLockLine, RiMailLine, RiCheckLine } from 'react-icons/ri';
 import useAuthStore from '../store/authStore';
 import toast from 'react-hot-toast';
+import { validatePassword } from '../utils/passwordValidator';
 import './AuthPages.css';
 
 export default function LoginPage() {
@@ -12,8 +13,41 @@ export default function LoginPage() {
   const [showPass, setShowPass] = useState(false);
   const [focused, setFocused]  = useState('');
 
+  const pwdCheck = validatePassword(form.password, {
+    email: form.email,
+  });
+
+  const getStrengthScore = () => {
+    if (!form.password) return 0;
+    let score = 0;
+    if (form.password.length >= 12) score++;
+    if (form.password.length >= 14) score++;
+    if (pwdCheck.checks.hasUppercase) score++;
+    if (pwdCheck.checks.hasLowercase) score++;
+    if (pwdCheck.checks.hasNumber) score++;
+    if (pwdCheck.checks.hasSpecial) score++;
+    if (pwdCheck.checks.notCommon) score++;
+    if (pwdCheck.checks.noPersonalInfo) score++;
+    return score; // Max 8
+  };
+
+  const getStrengthMeta = (score) => {
+    if (score === 0) return { label: 'Empty', color: 'rgba(255,255,255,0.1)' };
+    if (score <= 3) return { label: 'Weak', color: '#ef4444' };
+    if (score <= 5) return { label: 'Fair', color: '#f97316' };
+    if (score <= 7) return { label: 'Good', color: '#eab308' };
+    return { label: 'Very Strong', color: '#10b981' };
+  };
+
+  const score = getStrengthScore();
+  const meta = getStrengthMeta(score);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!pwdCheck.isValid) {
+      toast.error(pwdCheck.errors[0] || 'Password does not meet the strong password criteria');
+      return;
+    }
     const result = await login(form.email, form.password);
     if (result.success) {
       navigate('/');
@@ -58,12 +92,19 @@ export default function LoginPage() {
 
           {/* Password */}
           <div className="form-group">
-            <label className="form-label">Password</label>
+            <label className="form-label">
+              Password
+              {form.password && (
+                <span style={{ marginLeft: 8, color: meta.color, fontWeight: 700, textTransform: 'none', letterSpacing: 0, fontSize: 11 }}>
+                  — {meta.label}
+                </span>
+              )}
+            </label>
             <div className="input-wrapper">
               <input
                 type={showPass ? 'text' : 'password'}
                 className="input"
-                placeholder="Your password"
+                placeholder="Your password (min 12 chars)"
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 onFocus={() => setFocused('password')}
@@ -80,6 +121,52 @@ export default function LoginPage() {
                 {showPass ? <RiEyeOffLine /> : <RiEyeLine />}
               </button>
             </div>
+
+            {/* Strength bar */}
+            {form.password && (
+              <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                  <div key={i} style={{
+                    flex: 1, height: 3, borderRadius: 2,
+                    background: i <= score ? meta.color : 'rgba(255,255,255,0.1)',
+                    transition: 'background 0.3s',
+                  }} />
+                ))}
+              </div>
+            )}
+
+            {/* Password requirements checklist */}
+            {form.password && (
+              <div className="pwd-checklist">
+                <div className="pwd-checklist-title">Password Security Checklist:</div>
+                <ul className="pwd-checklist-list">
+                  <li className={pwdCheck.checks.lengthMin ? 'met' : 'unmet'}>
+                    {pwdCheck.checks.lengthMin ? <RiCheckLine className="icon-met" /> : <span className="bullet-unmet" />}
+                    <span>Length: Min 12 chars {pwdCheck.checks.lengthBetter ? '(14+ Better ✓)' : '(14+ better)'}</span>
+                  </li>
+                  <li className={(pwdCheck.checks.hasUppercase && pwdCheck.checks.hasLowercase) ? 'met' : 'unmet'}>
+                    {(pwdCheck.checks.hasUppercase && pwdCheck.checks.hasLowercase) ? <RiCheckLine className="icon-met" /> : <span className="bullet-unmet" />}
+                    <span>Case: Uppercase & lowercase letters</span>
+                  </li>
+                  <li className={pwdCheck.checks.hasNumber ? 'met' : 'unmet'}>
+                    {pwdCheck.checks.hasNumber ? <RiCheckLine className="icon-met" /> : <span className="bullet-unmet" />}
+                    <span>Numbers: Include numbers (e.g. 1 2 3)</span>
+                  </li>
+                  <li className={pwdCheck.checks.hasSpecial ? 'met' : 'unmet'}>
+                    {pwdCheck.checks.hasSpecial ? <RiCheckLine className="icon-met" /> : <span className="bullet-unmet" />}
+                    <span>Symbols: Special symbols (@ # $ % & *)</span>
+                  </li>
+                  <li className={pwdCheck.checks.notCommon ? 'met' : 'unmet'}>
+                    {pwdCheck.checks.notCommon ? <RiCheckLine className="icon-met" /> : <span className="bullet-unmet" />}
+                    <span>Unique: Avoid common words (e.g., qwerty, password)</span>
+                  </li>
+                  <li className={pwdCheck.checks.noPersonalInfo ? 'met' : 'unmet'}>
+                    {pwdCheck.checks.noPersonalInfo ? <RiCheckLine className="icon-met" /> : <span className="bullet-unmet" />}
+                    <span>Safe: No personal info (email, phone, birth year, school)</span>
+                  </li>
+                </ul>
+              </div>
+            )}
           </div>
 
           <button

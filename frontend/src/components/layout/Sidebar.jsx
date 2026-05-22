@@ -4,7 +4,7 @@ import {
   RiHome5Line, RiHome5Fill, RiCompassLine, RiCompassFill,
   RiNotification3Line, RiNotification3Fill, RiBookmarkLine, RiBookmarkFill,
   RiUser3Line, RiUser3Fill, RiLogoutBoxLine, RiPaletteLine,
-  RiMailLine, RiMailFill,
+  RiMailLine, RiMailFill, RiShieldCheckLine,
 } from 'react-icons/ri';
 import useAuthStore from '../../store/authStore';
 import './Sidebar.css';
@@ -81,6 +81,30 @@ export default function Sidebar() {
               <>
                 <span className="sidebar-link-icon">{isActive ? <RiUser3Fill /> : <RiUser3Line />}</span>
                 <span className="sidebar-link-label">Profile</span>
+              </>
+            )}
+          </NavLink>
+        )}
+
+        {/* Admin Panel link — only for admins */}
+        {user?.role === 'admin' && (
+          <NavLink
+            to="/admin"
+            className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+            onClick={(e) => handleNavClick('/admin', e)}
+          >
+            {({ isActive }) => (
+              <>
+                <span className="sidebar-link-icon">
+                  <RiShieldCheckLine />
+                </span>
+                <span className="sidebar-link-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  Admin
+                  <span style={{
+                    fontSize: 9, fontWeight: 800, background: 'linear-gradient(135deg,#7c5cff,#06b6d4)',
+                    color: 'white', padding: '1px 5px', borderRadius: 6, letterSpacing: 0.5,
+                  }}>PRO</span>
+                </span>
               </>
             )}
           </NavLink>

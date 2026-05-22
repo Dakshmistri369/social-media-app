@@ -147,6 +147,7 @@ app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/upload',        require('./routes/upload'));
 app.use('/api/stories',       require('./routes/stories'));
 app.use('/api/chats',         require('./routes/chats'));
+app.use('/api/admin',         require('./routes/admin'));
 
 // Health check
 app.get('/api/health', (req, res) => {

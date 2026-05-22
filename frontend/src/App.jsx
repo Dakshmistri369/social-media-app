@@ -14,6 +14,7 @@ import PostDetailPage from './pages/PostDetailPage';
 import NotificationsPage from './pages/NotificationsPage';
 import SavedPage from './pages/SavedPage';
 import MessagesPage from './pages/MessagesPage';
+import AdminPage from './pages/AdminPage';
 
 // Layout
 import AppLayout from './components/layout/AppLayout';
@@ -26,6 +27,13 @@ const PrivateRoute = ({ children }) => {
 const AuthRoute = ({ children }) => {
   const { isAuthenticated } = useAuthStore();
   return !isAuthenticated ? children : <Navigate to="/" replace />;
+};
+
+const AdminRoute = ({ children }) => {
+  const { isAuthenticated, user } = useAuthStore();
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (user?.role !== 'admin') return <Navigate to="/" replace />;
+  return children;
 };
 
 export default function App() {
@@ -79,6 +87,7 @@ export default function App() {
           <Route path="notifications" element={<NotificationsPage />} />
           <Route path="messages" element={<MessagesPage />} />
           <Route path="saved" element={<SavedPage />} />
+          <Route path="admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
         </Route>
       </Routes>
     </BrowserRouter>
