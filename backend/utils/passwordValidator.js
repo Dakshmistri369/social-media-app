@@ -1,6 +1,6 @@
 /**
  * Validates a password based on strict criteria:
- * 1. Length: Min 12, Better 14-16+
+ * 1. Length: Min 8, Better 10-12+
  * 2. Character Types: Uppercase, Lowercase, Number, Special symbol (@ # $ % & *)
  * 3. Avoid Common Passwords: 123456, password, qwerty, admin
  * 4. Avoid Personal Information: Name, username, email parts, birthdate/year (19xx/20xx), phone number (7+ digits), school/college keywords.
@@ -9,8 +9,8 @@ function validatePassword(password, userDetails = {}) {
   const { name = '', username = '', email = '' } = userDetails;
   const errors = [];
   const checks = {
-    lengthMin: password.length >= 12,
-    lengthBetter: password.length >= 14,
+    lengthMin: password.length >= 8,
+    lengthBetter: password.length >= 10,
     hasUppercase: /[A-Z]/.test(password),
     hasLowercase: /[a-z]/.test(password),
     hasNumber: /[0-9]/.test(password),
@@ -18,6 +18,11 @@ function validatePassword(password, userDetails = {}) {
     notCommon: true,
     noPersonalInfo: true,
   };
+
+  // Check length
+  if (!checks.lengthMin) {
+    errors.push('Password must be at least 8 characters long.');
+  }
 
   // Check Common Passwords
   const commonPasswords = ['123456', 'password', 'qwerty', 'admin'];

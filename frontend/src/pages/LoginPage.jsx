@@ -21,8 +21,8 @@ export default function LoginPage() {
   const getStrengthScore = () => {
     if (!form.password) return 0;
     let score = 0;
-    if (form.password.length >= 12) score++;
-    if (form.password.length >= 14) score++;
+    if (form.password.length >= 8) score++;
+    if (form.password.length >= 10) score++;
     if (pwdCheck.checks.hasUppercase) score++;
     if (pwdCheck.checks.hasLowercase) score++;
     if (pwdCheck.checks.hasNumber) score++;
@@ -109,7 +109,7 @@ export default function LoginPage() {
               <input
                 type={showPass ? 'text' : 'password'}
                 className="input"
-                placeholder="Your password (min 12 chars)"
+                placeholder="Your password (min 8 chars)"
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 onFocus={() => setFocused('password')}
@@ -147,7 +147,7 @@ export default function LoginPage() {
                 <ul className="pwd-checklist-list">
                   <li className={pwdCheck.checks.lengthMin ? 'met' : 'unmet'}>
                     {pwdCheck.checks.lengthMin ? <RiCheckLine className="icon-met" /> : <span className="bullet-unmet" />}
-                    <span>Length: Min 12 chars {pwdCheck.checks.lengthBetter ? '(14+ Better ✓)' : '(14+ better)'}</span>
+                    <span>Length: Min 8 chars {pwdCheck.checks.lengthBetter ? '(10+ Better ✓)' : '(10+ better)'}</span>
                   </li>
                   <li className={(pwdCheck.checks.hasUppercase && pwdCheck.checks.hasLowercase) ? 'met' : 'unmet'}>
                     {(pwdCheck.checks.hasUppercase && pwdCheck.checks.hasLowercase) ? <RiCheckLine className="icon-met" /> : <span className="bullet-unmet" />}
