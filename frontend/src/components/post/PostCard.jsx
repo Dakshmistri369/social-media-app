@@ -86,7 +86,7 @@ export default function PostCard({ post, onDelete }) {
     if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
     hoverTimeoutRef.current = setTimeout(() => {
       setShowReactionsSelector(true);
-    }, 200);
+    }, 150);
   };
 
   const handlePointerLeave = (e) => {
@@ -94,10 +94,10 @@ export default function PostCard({ post, onDelete }) {
     if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
     hoverTimeoutRef.current = setTimeout(() => {
       setShowReactionsSelector(false);
-    }, 350);
+    }, 250);
   };
 
-  const handleTouchStart = (e) => {
+  const handleTouchStart = () => {
     isPressingRef.current = true;
     preventClickRef.current = false;
     
@@ -113,7 +113,7 @@ export default function PostCard({ post, onDelete }) {
     }, 350);
   };
 
-  const handleTouchEnd = (e) => {
+  const handleTouchEnd = () => {
     isPressingRef.current = false;
     if (pressTimeoutRef.current) clearTimeout(pressTimeoutRef.current);
   };
@@ -135,7 +135,11 @@ export default function PostCard({ post, onDelete }) {
   const isOwn = user?._id === post.author?._id;
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
 
-  const myReaction = reactions.find(r => r.user === user?._id || r.user?._id === user?._id)?.type;
+  const myReaction = reactions.find(r => {
+    const reactionUserId = r.user?._id || r.user;
+    const currentUserId = user?._id || user?.id;
+    return reactionUserId && currentUserId && reactionUserId.toString() === currentUserId.toString();
+  })?.type;
 
   const handleReact = async (type) => {
     if (!user) { navigate('/login'); return; }
@@ -398,7 +402,9 @@ export default function PostCard({ post, onDelete }) {
               className={`post-action-btn react-btn ${myReaction ? 'reacted' : ''}`}
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
+              onTouchCancel={handleTouchEnd}
               onClick={handleButtonClick}
+              onContextMenu={(e) => e.preventDefault()}
             >
               <span className="react-icon-display">
                 {myReaction ? reactionsMap[myReaction] : <RiHeart3Line />}

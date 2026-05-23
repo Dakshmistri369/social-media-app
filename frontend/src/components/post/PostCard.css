@@ -11,7 +11,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .post-card:hover {
@@ -34,6 +34,8 @@
   border-bottom: 1px solid var(--border-dim);
   font-family: 'JetBrains Mono', monospace;
   letter-spacing: 0.5px;
+  border-top-left-radius: var(--radius-lg);
+  border-top-right-radius: var(--radius-lg);
 }
 
 /* Author row */
@@ -250,6 +252,14 @@
 .reactions-container {
   position: relative;
   display: inline-block;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.react-btn {
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .react-btn.reacted {
@@ -286,6 +296,17 @@
   animation: reaction-pop 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.175) forwards;
   pointer-events: auto;
   touch-action: manipulation;
+}
+
+/* Bridge the 10px hover dead-zone gap */
+.reactions-selector::after {
+  content: '';
+  position: absolute;
+  bottom: -15px;
+  left: 0;
+  right: 0;
+  height: 15px;
+  background: transparent;
 }
 
 .reaction-emoji-btn {
