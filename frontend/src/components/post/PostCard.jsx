@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import {
-  RiHeart3Line, RiHeart3Fill, RiChat3Line, RiRepeatLine,
+  RiHeart3Line, RiChat3Line, RiRepeatLine,
   RiBookmarkLine, RiBookmarkFill, RiMore2Line, RiShareLine,
-  RiCheckboxCircleFill, RiDeleteBin6Line, RiEdit2Line,
+  RiCheckboxCircleFill, RiDeleteBin6Line,
 } from 'react-icons/ri';
 import useAuthStore from '../../store/authStore';
 import usePostStore from '../../store/postStore';
@@ -26,6 +27,7 @@ export default function PostCard({ post, onDelete }) {
   const { removePost } = usePostStore();
   const [reactions, setReactions] = useState(post.reactions || []);
   const [showReactionsSelector, setShowReactionsSelector] = useState(false);
+  const [selectorPos, setSelectorPos] = useState({ top: 0, left: 0 });
   const [poll, setPoll] = useState(post.poll);
   const [saved, setSaved] = useState(() => {
     if (!user || !user.savedPosts) return false;
@@ -38,6 +40,7 @@ export default function PostCard({ post, onDelete }) {
     return post.shares.some(id => (id?._id || id) === userId);
   });
   const menuRef = useRef(null);
+  const reactBtnRef = useRef(null);
   const navigate = useNavigate();
 
   const hoverTimeoutRef = useRef(null);
@@ -65,50 +68,75 @@ export default function PostCard({ post, onDelete }) {
     };
   }, []);
 
-  // Close reactions selector when clicking outside
+  // Close reactions selector when clicking outside or scrolling
   useEffect(() => {
     if (!showReactionsSelector) return;
     const handleOutsideClose = (e) => {
-      if (!e.target.closest('.reactions-container')) {
+      if (
+        !e.target.closest('.reactions-container') &&
+        !e.target.closest('.reactions-selector')
+      ) {
         setShowReactionsSelector(false);
       }
     };
+    const handleScroll = () => setShowReactionsSelector(false);
     document.addEventListener('click', handleOutsideClose);
     document.addEventListener('touchstart', handleOutsideClose);
+    window.addEventListener('scroll', handleScroll, true);
     return () => {
       document.removeEventListener('click', handleOutsideClose);
       document.removeEventListener('touchstart', handleOutsideClose);
+      window.removeEventListener('scroll', handleScroll, true);
     };
   }, [showReactionsSelector]);
+
+  // Compute fixed position for the portal-based reactions selector
+  const openSelector = () => {
+    if (reactBtnRef.current) {
+      const rect = reactBtnRef.current.getBoundingClientRect();
+      setSelectorPos({
+        // Place above the button; adjust if too close to top of viewport
+        top: Math.max(rect.top - 60, 8),
+        left: Math.max(rect.left, 8),
+      });
+    }
+    setShowReactionsSelector(true);
+  };
+
+  const closeSelector = () => setShowReactionsSelector(false);
 
   const handlePointerEnter = (e) => {
     if (e.pointerType === 'touch') return;
     if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
-    hoverTimeoutRef.current = setTimeout(() => {
-      setShowReactionsSelector(true);
-    }, 150);
+    hoverTimeoutRef.current = setTimeout(openSelector, 150);
   };
 
   const handlePointerLeave = (e) => {
     if (e.pointerType === 'touch') return;
     if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
-    hoverTimeoutRef.current = setTimeout(() => {
-      setShowReactionsSelector(false);
-    }, 250);
+    hoverTimeoutRef.current = setTimeout(closeSelector, 250);
+  };
+
+  // Keep selector open when mouse is over it (portal is outside the container)
+  const handleSelectorPointerEnter = () => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+  };
+
+  const handleSelectorPointerLeave = () => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    hoverTimeoutRef.current = setTimeout(closeSelector, 200);
   };
 
   const handleTouchStart = () => {
     isPressingRef.current = true;
     preventClickRef.current = false;
-    
+
     if (pressTimeoutRef.current) clearTimeout(pressTimeoutRef.current);
     pressTimeoutRef.current = setTimeout(() => {
       if (isPressingRef.current) {
-        setShowReactionsSelector(true);
+        openSelector();
         preventClickRef.current = true;
-        if (navigator.vibrate) {
-          navigator.vibrate(30);
-        }
+        if (navigator.vibrate) navigator.vibrate(30);
       }
     }, 350);
   };
@@ -124,9 +152,8 @@ export default function PostCard({ post, onDelete }) {
       preventClickRef.current = false;
       return;
     }
-    
     if (showReactionsSelector) {
-      setShowReactionsSelector(false);
+      closeSelector();
     } else {
       handleReact(myReaction || 'like');
     }
@@ -399,6 +426,7 @@ export default function PostCard({ post, onDelete }) {
             onPointerLeave={handlePointerLeave}
           >
             <button
+              ref={reactBtnRef}
               className={`post-action-btn react-btn ${myReaction ? 'reacted' : ''}`}
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
@@ -411,25 +439,32 @@ export default function PostCard({ post, onDelete }) {
               </span>
               <span>{reactions.length}</span>
             </button>
-
-            {showReactionsSelector && (
-              <div className="reactions-selector">
-                {Object.entries(reactionsMap).map(([type, emoji]) => (
-                  <button
-                    key={type}
-                    className={`reaction-emoji-btn ${myReaction === type ? 'active' : ''}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleReact(type);
-                    }}
-                    title={type}
-                  >
-                    {emoji}
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
+
+          {/* Portal-rendered reactions selector — escapes all parent overflow/stacking contexts */}
+          {showReactionsSelector && createPortal(
+            <div
+              className="reactions-selector"
+              style={{ top: selectorPos.top, left: selectorPos.left }}
+              onPointerEnter={handleSelectorPointerEnter}
+              onPointerLeave={handleSelectorPointerLeave}
+            >
+              {Object.entries(reactionsMap).map(([type, emoji]) => (
+                <button
+                  key={type}
+                  className={`reaction-emoji-btn ${myReaction === type ? 'active' : ''}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleReact(type);
+                  }}
+                  title={type}
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>,
+            document.body
+          )}
 
           <button className="post-action-btn comment-btn" onClick={() => navigate(`/post/${post._id}`)}>
             <RiChat3Line />

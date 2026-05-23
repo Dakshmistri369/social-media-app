@@ -279,9 +279,7 @@
 }
 
 .reactions-selector {
-  position: absolute;
-  bottom: 100%;
-  left: 0;
+  position: fixed;
   background: var(--bg-card);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-full);
@@ -289,13 +287,15 @@
   display: flex;
   gap: 10px;
   box-shadow: var(--shadow-lg), 0 10px 30px rgba(0,0,0,0.5);
-  z-index: 100;
-  margin-bottom: 10px;
+  z-index: 9999;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   animation: reaction-pop 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.175) forwards;
   pointer-events: auto;
   touch-action: manipulation;
+  /* Prevent text selection on the pill */
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* Bridge the 10px hover dead-zone gap */
