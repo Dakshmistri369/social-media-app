@@ -35,6 +35,8 @@
   backdrop-filter: var(--blur-lg);
   -webkit-backdrop-filter: var(--blur-lg);
   box-shadow: var(--shadow-card);
+  /* Must be visible so portal positions correctly */
+  overflow: visible;
 }
 
 .post-detail-header { display: flex; align-items: center; justify-content: space-between; }
@@ -62,14 +64,57 @@
 }
 .post-detail-stats strong { color: var(--text-primary); }
 
+/* ── Action bar ── */
 .post-detail-actions {
   display: flex;
+  align-items: center;
   gap: 4px;
   padding: 4px 0;
   border-bottom: 1px solid var(--border);
 }
 
-.post-detail-comments { display: flex; flex-direction: column; gap: 16px; padding-top: 8px; }
+/* React container (wraps the button for hover detection) */
+.pd-reactions-container {
+  position: relative;
+  display: inline-flex;
+  user-select: none;
+  -webkit-user-select: none;
+}
 
+/* The react button itself */
+.pd-react-btn {
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pd-react-btn.liked {
+  color: var(--accent);
+}
+
+/* Emoji inside the button */
+.pd-react-icon {
+  font-size: 18px;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.post-detail-comments { display: flex; flex-direction: column; gap: 16px; padding-top: 8px; }
 .comments-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
 
+/* ── Mobile responsive ── */
+@media (max-width: 480px) {
+  .post-detail-actions {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .post-detail-actions .post-action-btn span {
+    display: none;
+  }
+}
