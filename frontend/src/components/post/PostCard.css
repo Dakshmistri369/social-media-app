@@ -269,7 +269,7 @@
 
 @keyframes reaction-pop {
   0% {
-    transform: translateY(8px) scale(0.9);
+    transform: translateY(10px) scale(0.85);
     opacity: 0;
   }
   100% {
@@ -279,62 +279,53 @@
 }
 
 .reactions-selector {
-  position: fixed;
+  /* position & top/left set via inline style by the portal */
   background: var(--bg-card);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-full);
-  padding: 6px 12px;
+  padding: 6px 14px;
   display: flex;
-  gap: 10px;
-  box-shadow: var(--shadow-lg), 0 10px 30px rgba(0,0,0,0.5);
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4);
   z-index: 9999;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  animation: reaction-pop 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.175) forwards;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  animation: reaction-pop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   pointer-events: auto;
   touch-action: manipulation;
-  /* Prevent text selection on the pill */
   user-select: none;
   -webkit-user-select: none;
-}
-
-/* Bridge the 10px hover dead-zone gap */
-.reactions-selector::after {
-  content: '';
-  position: absolute;
-  bottom: -15px;
-  left: 0;
-  right: 0;
-  height: 15px;
-  background: transparent;
+  white-space: nowrap;
 }
 
 .reaction-emoji-btn {
   background: transparent;
   border: none;
-  font-size: 22px;
+  font-size: 24px;
   cursor: pointer;
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.2s;
-  padding: 4px;
+  transition: transform 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.18s;
+  padding: 4px 2px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   user-select: none;
   -webkit-user-drag: none;
+  line-height: 1;
 }
 
 .reaction-emoji-btn:hover {
-  transform: scale(1.35) translateY(-3px);
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
+  transform: scale(1.4) translateY(-4px);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
 }
 
 .reaction-emoji-btn:active {
-  transform: scale(1.1) translateY(-1px);
+  transform: scale(1.15) translateY(-2px);
 }
 
 .reaction-emoji-btn.active {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.18);
   border-radius: 50%;
 }
 

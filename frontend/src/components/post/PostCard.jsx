@@ -92,14 +92,30 @@ export default function PostCard({ post, onDelete }) {
 
   // Compute fixed position for the portal-based reactions selector
   const openSelector = () => {
-    if (reactBtnRef.current) {
-      const rect = reactBtnRef.current.getBoundingClientRect();
-      setSelectorPos({
-        // Place above the button; adjust if too close to top of viewport
-        top: Math.max(rect.top - 60, 8),
-        left: Math.max(rect.left, 8),
-      });
+    if (!reactBtnRef.current) {
+      setShowReactionsSelector(true);
+      return;
     }
+    const rect = reactBtnRef.current.getBoundingClientRect();
+    // Picker dimensions (measured from CSS: 6px*2 padding + ~36px emoji = ~52px tall, ~280px wide)
+    const PICKER_H = 52;
+    const PICKER_W = 290;
+    const GAP = 8;
+
+    // Prefer above the button; if not enough space above, place below
+    const spaceAbove = rect.top;
+    const top = spaceAbove >= PICKER_H + GAP
+      ? rect.top - PICKER_H - GAP          // above
+      : rect.bottom + GAP;                 // below
+
+    // Horizontally: center on the button, then clamp within viewport
+    const idealLeft = rect.left + rect.width / 2 - PICKER_W / 2;
+    const left = Math.min(
+      Math.max(idealLeft, GAP),
+      window.innerWidth - PICKER_W - GAP
+    );
+
+    setSelectorPos({ top, left });
     setShowReactionsSelector(true);
   };
 
@@ -441,31 +457,6 @@ export default function PostCard({ post, onDelete }) {
             </button>
           </div>
 
-          {/* Portal-rendered reactions selector — escapes all parent overflow/stacking contexts */}
-          {showReactionsSelector && createPortal(
-            <div
-              className="reactions-selector"
-              style={{ top: selectorPos.top, left: selectorPos.left }}
-              onPointerEnter={handleSelectorPointerEnter}
-              onPointerLeave={handleSelectorPointerLeave}
-            >
-              {Object.entries(reactionsMap).map(([type, emoji]) => (
-                <button
-                  key={type}
-                  className={`reaction-emoji-btn ${myReaction === type ? 'active' : ''}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleReact(type);
-                  }}
-                  title={type}
-                >
-                  {emoji}
-                </button>
-              ))}
-            </div>,
-            document.body
-          )}
-
           <button className="post-action-btn comment-btn" onClick={() => navigate(`/post/${post._id}`)}>
             <RiChat3Line />
             <span>{post.comments?.length || 0}</span>
@@ -491,6 +482,36 @@ export default function PostCard({ post, onDelete }) {
           </button>
         </div>
       </div>
+
+      {/* Portal: renders at document.body — completely escapes all parent layout/overflow/stacking contexts */}
+      {showReactionsSelector && createPortal(
+        <div
+          className="reactions-selector"
+          style={{
+            position: 'fixed',
+            top: selectorPos.top,
+            left: selectorPos.left,
+          }}
+          onPointerEnter={handleSelectorPointerEnter}
+          onPointerLeave={handleSelectorPointerLeave}
+        >
+          {Object.entries(reactionsMap).map(([type, emoji]) => (
+            <button
+              key={type}
+              className={`reaction-emoji-btn ${myReaction === type ? 'active' : ''}`}
+              onPointerDown={(e) => {
+                // Use onPointerDown so it fires before the outside-click handler
+                e.stopPropagation();
+                handleReact(type);
+              }}
+              title={type}
+            >
+              {emoji}
+            </button>
+          ))}
+        </div>,
+        document.body
+      )}
     </article>
   );
 }
