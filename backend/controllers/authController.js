@@ -3,6 +3,14 @@ const User = require('../models/User');
 const Otp  = require('../models/Otp');
 const { validatePassword } = require('../utils/passwordValidator');
 const { hasAbusiveLanguage } = require('../utils/badWordsFilter');
+const twilio = require('twilio');
+
+// Initialize Twilio client if credentials exist
+let twilioClient = null;
+if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
+  twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+}
+
 
 const generateToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -126,11 +134,32 @@ exports.sendOtp = async (req, res) => {
     // Print OTP in terminal for convenience
     console.log(`\n--- [OTP VERIFICATION] ---\nPhone: ${phoneNumber}\nOTP Code: ${otp}\n---------------------------\n`);
 
-    // Return the OTP in the API response so the user can easily see it on-screen and use it
+    let smsSent = false;
+    let smsError = null;
+
+    if (twilioClient && process.env.TWILIO_PHONE_NUMBER) {
+      try {
+        await twilioClient.messages.create({
+          body: `[LinkUp] Your verification code is ${otp}. Valid for 5 minutes.`,
+          from: process.env.TWILIO_PHONE_NUMBER,
+          to: phoneNumber
+        });
+        smsSent = true;
+        console.log(`✅ SMS successfully sent via Twilio to ${phoneNumber}`);
+      } catch (error) {
+        console.error(`❌ Failed to send SMS via Twilio to ${phoneNumber}:`, error.message);
+        smsError = error.message;
+      }
+    } else {
+      console.log(`⚠️ Twilio credentials not configured in environmental variables. Falling back to log/demo mode.`);
+    }
+
+    // Return the response. If Twilio was configured but failed, we can inform the client or still succeed with fallback code
     res.status(200).json({ 
       success: true, 
-      message: 'OTP sent successfully',
-      otp: otp // Included for testing and presentation purposes
+      message: smsSent ? 'OTP sent to your mobile number.' : 'OTP sent successfully (Demo Mode).',
+      otp: smsSent ? undefined : otp, // Hide OTP from API response if sent via real SMS!
+      smsError: smsError || undefined
     });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
