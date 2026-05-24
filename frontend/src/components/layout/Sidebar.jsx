@@ -48,7 +48,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="sidebar">
+    <aside className="sidebar" onMouseLeave={() => setShowThemes(false)}>
       {/* Logo */}
       <Link to="/" className="sidebar-logo" onClick={() => { window.location.href = '/'; }}>
         <img src="/linkup-logo.svg" alt="LinkUp" className="logo-img" />
