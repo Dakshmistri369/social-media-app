@@ -137,24 +137,65 @@ exports.sendOtp = async (req, res) => {
     let smsSent = false;
     let smsError = null;
 
-    if (twilioClient && process.env.TWILIO_PHONE_NUMBER) {
+    const bulkBlasterApiKey = process.env.BULKBLASTER_API_KEY || 'bb_LqahQ0ROxl28b1ahmnClfsvOJJ4o5t3U';
+
+    if (bulkBlasterApiKey) {
       try {
+        const cleanPhone = phoneNumber.replace(/^\+91/, '');
+        const messageText = `[LinkUp] Your verification code is ${otp}. Valid for 5 minutes.`;
+
+        console.log(`Sending Bulk Blaster SMS to ${cleanPhone}...`);
+        const response = await fetch("https://bulkblaster-india-sms-lc-290441563653.asia-south1.run.app/send-sms", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            apiKey: bulkBlasterApiKey,
+            phone: cleanPhone,
+            message: messageText
+          })
+        });
+
+        const data = await response.json();
+        console.log("Bulk Blaster Response:", data);
+
+        if (response.ok && data.success) {
+          smsSent = true;
+          console.log(`✅ SMS successfully sent via Bulk Blaster to ${phoneNumber}`);
+        } else {
+          smsError = data.message || `Bulk Blaster API returned status ${response.status}`;
+          console.error(`❌ Bulk Blaster failed to send SMS:`, smsError);
+        }
+      } catch (error) {
+        console.error(`❌ Failed to make request to Bulk Blaster:`, error.message);
+        smsError = error.message;
+      }
+    }
+
+    // Fallback to Twilio if Bulk Blaster was not configured or failed
+    if (!smsSent && twilioClient && process.env.TWILIO_PHONE_NUMBER) {
+      try {
+        console.log(`Attempting Twilio SMS fallback to ${phoneNumber}...`);
         await twilioClient.messages.create({
           body: `[LinkUp] Your verification code is ${otp}. Valid for 5 minutes.`,
           from: process.env.TWILIO_PHONE_NUMBER,
           to: phoneNumber
         });
         smsSent = true;
+        smsError = null; // Clear Bulk Blaster error as we succeeded with Twilio
         console.log(`✅ SMS successfully sent via Twilio to ${phoneNumber}`);
       } catch (error) {
-        console.error(`❌ Failed to send SMS via Twilio to ${phoneNumber}:`, error.message);
-        smsError = error.message;
+        console.error(`❌ Failed to send SMS via Twilio fallback to ${phoneNumber}:`, error.message);
+        smsError = `Bulk Blaster error: ${smsError || 'none'}. Twilio error: ${error.message}`;
       }
-    } else {
-      console.log(`⚠️ Twilio credentials not configured in environmental variables. Falling back to log/demo mode.`);
     }
 
-    // Return the response. If Twilio was configured but failed, we can inform the client or still succeed with fallback code
+    if (!smsSent) {
+      console.log(`⚠️ SMS not sent via Bulk Blaster or Twilio. Falling back to log/demo mode.`);
+    }
+
+    // Return the response. If SMS was sent, we hide the OTP from the API response for security.
     res.status(200).json({ 
       success: true, 
       message: smsSent ? 'OTP sent to your mobile number.' : 'OTP sent successfully (Demo Mode).',
