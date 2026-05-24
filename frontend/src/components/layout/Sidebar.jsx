@@ -50,10 +50,10 @@ export default function Sidebar() {
   return (
     <aside className="sidebar">
       {/* Logo */}
-      <div className="sidebar-logo">
+      <Link to="/" className="sidebar-logo" onClick={() => { window.location.href = '/'; }}>
         <img src="/linkup-logo.svg" alt="LinkUp" className="logo-img" />
         <span className="logo-text">LinkUp</span>
-      </div>
+      </Link>
 
       {/* Nav */}
       <nav className="sidebar-nav">
