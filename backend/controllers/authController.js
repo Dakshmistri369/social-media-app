@@ -1,5 +1,6 @@
 const jwt  = require('jsonwebtoken');
 const User = require('../models/User');
+const Otp  = require('../models/Otp');
 const { validatePassword } = require('../utils/passwordValidator');
 const { hasAbusiveLanguage } = require('../utils/badWordsFilter');
 
@@ -90,6 +91,121 @@ exports.getMe = async (req, res) => {
       .populate('followers', 'username name avatar')
       .populate('following', 'username name avatar');
     res.json({ success: true, user });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// @POST /api/auth/send-otp
+exports.sendOtp = async (req, res) => {
+  try {
+    const { phoneNumber } = req.body;
+    if (!phoneNumber) {
+      return res.status(400).json({ success: false, message: 'Phone number is required' });
+    }
+
+    // Validation for Indian phone number: starts with +91 followed by 10 digits
+    const phoneRegex = /^\+91\d{10}$/;
+    if (!phoneRegex.test(phoneNumber)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Invalid phone number format. Must start with +91 followed by a 10-digit number.' 
+      });
+    }
+
+    // Generate a 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Save/Update in DB with the 5 minutes TTL
+    await Otp.findOneAndUpdate(
+      { phoneNumber },
+      { otp, createdAt: new Date() },
+      { upsert: true, new: true }
+    );
+
+    // Print OTP in terminal for convenience
+    console.log(`\n--- [OTP VERIFICATION] ---\nPhone: ${phoneNumber}\nOTP Code: ${otp}\n---------------------------\n`);
+
+    // Return the OTP in the API response so the user can easily see it on-screen and use it
+    res.status(200).json({ 
+      success: true, 
+      message: 'OTP sent successfully',
+      otp: otp // Included for testing and presentation purposes
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// @POST /api/auth/verify-otp
+exports.verifyOtp = async (req, res) => {
+  try {
+    const { phoneNumber, otp } = req.body;
+    if (!phoneNumber || !otp) {
+      return res.status(400).json({ success: false, message: 'Phone number and OTP are required' });
+    }
+
+    const phoneRegex = /^\+91\d{10}$/;
+    if (!phoneRegex.test(phoneNumber)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Invalid phone number format. Must start with +91 followed by a 10-digit number.' 
+      });
+    }
+
+    // Verify OTP
+    const otpRecord = await Otp.findOne({ phoneNumber, otp });
+    if (!otpRecord) {
+      return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
+    }
+
+    // OTP verified, remove it
+    await Otp.deleteOne({ _id: otpRecord._id });
+
+    // Check if user exists
+    let user = await User.findOne({ phoneNumber });
+    let isNewUser = false;
+
+    if (!user) {
+      isNewUser = true;
+      const phoneDigits = phoneNumber.slice(3); // 10 digits
+      const username = `user_${phoneDigits}`;
+      const name = `User ${phoneDigits}`;
+      const email = `${phoneDigits}@linkup.com`;
+      // Generate a secure password that passes validatePassword
+      const password = `OtpUser_${Math.random().toString(36).substring(2, 6).toUpperCase()}9_Pass!`;
+
+      // Check if temporary credentials exist (edge case)
+      const existing = await User.findOne({ $or: [{ email }, { username }] });
+      if (existing) {
+        const randSuffix = Math.floor(100 + Math.random() * 900);
+        user = await User.create({
+          username: `${username}_${randSuffix}`,
+          email: `${phoneDigits}_${randSuffix}@linkup.com`,
+          password,
+          name,
+          phoneNumber,
+          isVerified: true
+        });
+      } else {
+        user = await User.create({
+          username,
+          email,
+          password,
+          name,
+          phoneNumber,
+          isVerified: true
+        });
+      }
+    }
+
+    const token = generateToken(user._id);
+    res.status(200).json({ 
+      success: true, 
+      token, 
+      user: user.toJSON(),
+      isNewUser 
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

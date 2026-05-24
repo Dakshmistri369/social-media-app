@@ -42,6 +42,12 @@ const userSchema = new mongoose.Schema({
   followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   savedPosts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
+  phoneNumber: {
+    type: String,
+    unique: true,
+    sparse: true,
+    trim: true,
+  },
   isVerified: { type: Boolean, default: false },
   role: { type: String, enum: ['user', 'admin'], default: 'user' },
 }, { timestamps: true });

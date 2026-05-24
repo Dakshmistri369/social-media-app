@@ -25,6 +25,32 @@ const useAuthStore = create(
         }
       },
 
+      sendOtp: async (phoneNumber) => {
+        set({ isLoading: true });
+        try {
+          const { data } = await API.post('/auth/send-otp', { phoneNumber });
+          return { success: true, otp: data.otp, message: data.message };
+        } catch (err) {
+          return { success: false, message: err.response?.data?.message || 'Failed to send OTP' };
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      verifyOtp: async (phoneNumber, otp) => {
+        set({ isLoading: true });
+        try {
+          const { data } = await API.post('/auth/verify-otp', { phoneNumber, otp });
+          localStorage.setItem('token', data.token);
+          set({ user: data.user, token: data.token, isAuthenticated: true, loginTime: Date.now() });
+          return { success: true, isNewUser: data.isNewUser };
+        } catch (err) {
+          return { success: false, message: err.response?.data?.message || 'OTP verification failed' };
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
       register: async (username, email, password, name) => {
         set({ isLoading: true });
         try {
