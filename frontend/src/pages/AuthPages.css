@@ -9,7 +9,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-primary);
+  background: 
+    linear-gradient(rgba(10, 10, 15, 0.75), rgba(10, 10, 15, 0.75)),
+    url('/linkup-bg.png') no-repeat center center / cover;
   position: relative;
   overflow: hidden;
   padding: 20px;
@@ -63,9 +65,9 @@
 
 /* ── Glass Card ─────────────────────────────────────────── */
 .auth-card {
-  background: rgba(15, 15, 20, 0.75);
-  backdrop-filter: blur(32px);
-  -webkit-backdrop-filter: blur(32px);
+  background: rgba(15, 15, 20, 0.72);
+  backdrop-filter: blur(36px);
+  -webkit-backdrop-filter: blur(36px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
   padding: 44px 40px;
@@ -78,6 +80,71 @@
     0 24px 64px rgba(0,0,0,0.6),
     0 0 80px rgba(124,92,255,0.08);
   animation: card-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.1) both;
+  overflow: hidden; /* Enforce bounds for glass glance effect */
+}
+
+/* Glass Glance / Shimmer sweep reflection effect */
+.auth-card::after {
+  content: '';
+  position: absolute;
+  top: -150%;
+  left: -150%;
+  width: 300%;
+  height: 300%;
+  background: linear-gradient(
+    45deg,
+    transparent 45%,
+    rgba(255, 255, 255, 0.01) 47%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(255, 255, 255, 0.01) 53%,
+    transparent 55%
+  );
+  transform: rotate(-45deg);
+  pointer-events: none;
+  animation: card-glance 7s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+}
+
+@keyframes card-glance {
+  0% {
+    transform: translate(-30%, -30%) rotate(-45deg);
+  }
+  15%, 100% {
+    transform: translate(30%, 30%) rotate(-45deg);
+  }
+}
+
+/* Coder Secure Status Badge */
+.coder-badge-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(124, 92, 255, 0.08);
+  border: 1px solid rgba(124, 92, 255, 0.22);
+  border-radius: 20px;
+  padding: 6px 14px;
+  margin: 0 auto 20px auto;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 9.5px;
+  font-weight: 800;
+  color: #a78bfa;
+  letter-spacing: 1.5px;
+  box-shadow: 0 0 15px rgba(124, 92, 255, 0.08);
+  text-shadow: 0 0 8px rgba(124, 92, 255, 0.3);
+  text-transform: uppercase;
+}
+
+.coder-status-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #10b981, 0 0 16px #10b981;
+  animation: coder-pulse 1.5s infinite alternate;
+}
+
+@keyframes coder-pulse {
+  from { opacity: 0.4; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1.15); }
 }
 
 @keyframes card-in {

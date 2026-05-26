@@ -71,6 +71,14 @@ export default function RegisterPage() {
       <div className="auth-bg-orb orb3" />
 
       <div className="auth-card">
+        {/* Coder Badge */}
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div className="coder-badge-container">
+            <span className="coder-status-dot" />
+            <span className="coder-badge-text">WORLD'S TOP 10 CODER SECURE PORTAL</span>
+          </div>
+        </div>
+
         {/* Logo */}
         <div className="auth-logo">
           <img src="/linkup-logo.svg" alt="LinkUp" className="auth-logo-img" />
