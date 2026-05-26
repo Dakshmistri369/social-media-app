@@ -63,7 +63,7 @@
   font-family: 'Syne', sans-serif;
   font-size: 19px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-primary);
   letter-spacing: -0.5px;
   opacity: 0;
   visibility: hidden;
@@ -318,6 +318,7 @@
 .cyberpunk-dot { background: #ff007f; box-shadow: 0 0 6px rgba(255, 0, 127, 0.6); }
 .deepspace-dot { background: #6366f1; box-shadow: 0 0 6px rgba(99, 102, 241, 0.6); }
 .amethyst-dot { background: #a855f7; box-shadow: 0 0 6px rgba(168, 85, 247, 0.6); }
+.white-dot { background: #ffffff; box-shadow: 0 0 6px rgba(0, 0, 0, 0.2); border: 1px solid rgba(0, 0, 0, 0.2) !important; }
 
 @media (max-width: 768px) {
   .sidebar { display: none; }

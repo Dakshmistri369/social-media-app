@@ -556,3 +556,36 @@ body.theme-amethyst {
   --accent-dark: #581c87;
 }
 
+body.theme-white {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-card-2: #f8fafc;
+  --bg-hover: rgba(124, 92, 255, 0.06);
+  --bg-input: #f1f5f9;
+
+  --accent: #6366f1;
+  --accent-dim: #4f46e5;
+  --accent-light: #4338ca;
+  --accent-dark: #e0e7ff;
+  --accent-glow: rgba(99, 102, 241, 0.15);
+  --accent-glow-sm: rgba(99, 102, 241, 0.08);
+  --accent-gradient: linear-gradient(135deg, #6366f1, #06b6d4);
+
+  --red: #ef4444;
+  --orange: #f97316;
+  --blue: #3b82f6;
+  --yellow: #eab308;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --text-mono: #4f46e5;
+
+  --border: rgba(0, 0, 0, 0.06);
+  --border-light: rgba(0, 0, 0, 0.12);
+  --border-dim: #cbd5e1;
+
+  --bg-glass: rgba(255, 255, 255, 0.8);
+}
+

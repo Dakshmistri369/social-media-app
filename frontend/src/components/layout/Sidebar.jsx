@@ -134,6 +134,9 @@ export default function Sidebar() {
               <button onClick={() => selectTheme('amethyst')} className="theme-option amethyst">
                 <span className="theme-dot amethyst-dot" /> Amethyst
               </button>
+              <button onClick={() => selectTheme('white')} className="theme-option white">
+                <span className="theme-dot white-dot" /> White
+              </button>
             </div>
           )}
         </div>
