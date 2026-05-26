@@ -15,15 +15,15 @@
 }
 
 .rs-card {
-  background: rgba(45, 90, 39, 0.12);
+  background: var(--bg-glass);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(164, 244, 194, 0.1);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 16px;
   transition: all 0.2s ease;
 }
-.rs-card:hover { border-color: rgba(164, 244, 194, 0.25); }
+.rs-card:hover { border-color: var(--border-light); }
 
 .rs-title {
   display: flex;

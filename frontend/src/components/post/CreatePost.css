@@ -2,17 +2,18 @@
    CREATE POST — Dark Bio-Tech
 ══════════════════════════════════════ */
 .create-post {
-  background: rgba(45, 90, 39, 0.12);
+  background: var(--bg-glass);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(164, 244, 194, 0.1);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 16px;
   transition: all 0.2s ease;
   margin-bottom: 24px;
 }
 .create-post.focused {
-  background: rgba(45, 90, 39, 0.18);
+  background: var(--bg-hover);
+  border-color: var(--border-light);
 }
 
 .create-post-header {
@@ -45,7 +46,7 @@
 .create-post-textarea::placeholder { color: var(--text-muted); }
 .create-post-textarea:focus {
   border-color: var(--accent);
-  background: rgba(164, 244, 194, 0.03);
+  background: var(--bg-primary);
 }
 
 /* Preview grid */
@@ -94,7 +95,7 @@
 .toolbar-btn {
   width: 34px; height: 34px;
   border-radius: var(--radius-sm);
-  background: rgba(164,244,194,0.08);
+  background: var(--bg-hover);
   border: 1px solid var(--border);
   color: var(--accent);
   display: flex; align-items: center; justify-content: center;
@@ -109,7 +110,7 @@
   width: auto;
 }
 .toolbar-btn:hover {
-  background: rgba(164,244,194,0.15);
+  background: var(--accent-glow-sm);
   border-color: var(--accent);
   box-shadow: 0 0 8px var(--accent-glow-sm);
 }
@@ -138,7 +139,7 @@
 
 .post-submit-btn {
   background: var(--accent);
-  color: #003920;
+  color: var(--bg-primary);
   font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
   letter-spacing: 0.5px;

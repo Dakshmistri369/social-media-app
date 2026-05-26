@@ -2,10 +2,10 @@
    POST CARD — Dark Bio-Tech
 ══════════════════════════════════════ */
 .post-card {
-  background: rgba(45, 90, 39, 0.12);
+  background: var(--bg-glass);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(164, 244, 194, 0.1);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   margin-bottom: 16px;
   cursor: pointer;
@@ -15,8 +15,8 @@
 }
 
 .post-card:hover {
-  background: rgba(45, 90, 39, 0.18);
-  border-color: rgba(164, 244, 194, 0.2);
+  background: var(--bg-hover);
+  border-color: var(--border-light);
 }
 
 .post-card-inner {
@@ -91,9 +91,9 @@
   font-family: 'JetBrains Mono', monospace;
   padding: 2px 7px;
   border-radius: 3px;
-  background: rgba(164,244,194,0.10);
+  background: var(--accent-glow-sm);
   color: var(--accent);
-  border: 1px solid rgba(164,244,194,0.20);
+  border: 1px solid var(--accent-glow);
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -194,9 +194,9 @@
   font-family: 'JetBrains Mono', monospace;
   padding: 3px 8px;
   border-radius: 3px;
-  background: rgba(164,244,194,0.15);
-  color: var(--accent);
-  border: 1px solid rgba(164,244,194,0.30);
+  background: var(--bg-glass);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
   backdrop-filter: blur(4px);
 }
 
@@ -264,7 +264,7 @@
 
 .react-btn.reacted {
   color: var(--accent);
-  background: rgba(164, 244, 194, 0.08);
+  background: var(--accent-glow-sm);
 }
 
 @keyframes reaction-pop {
@@ -384,7 +384,7 @@
   top: 0;
   left: 0;
   bottom: 0;
-  background: rgba(164, 244, 194, 0.08);
+  background: var(--accent-glow-sm);
   z-index: 1;
   transition: width 0.4s cubic-bezier(0.1, 0.8, 0.2, 1);
 }
