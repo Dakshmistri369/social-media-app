@@ -558,11 +558,11 @@ body.theme-amethyst {
 
 body.theme-white {
   --bg-primary: #000000;
-  --bg-secondary: #050505;
-  --bg-card: #0c0c0c;
-  --bg-card-2: #080808;
+  --bg-secondary: #000000;
+  --bg-card: #161616;
+  --bg-card-2: #222222;
   --bg-hover: rgba(255, 255, 255, 0.08);
-  --bg-input: #0c0c0c;
+  --bg-input: #1e1e1e;
 
   --accent: #ffffff;
   --accent-dim: #d4d4d4;
@@ -583,9 +583,9 @@ body.theme-white {
   --text-mono: #ffffff;
 
   --border: rgba(255, 255, 255, 0.08);
-  --border-light: rgba(255, 255, 255, 0.18);
-  --border-dim: #333333;
+  --border-light: rgba(255, 255, 255, 0.15);
+  --border-dim: #2c2c2c;
 
-  --bg-glass: rgba(0, 0, 0, 0.85);
+  --bg-glass: rgba(22, 22, 22, 0.85);
 }
 
