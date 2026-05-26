@@ -112,12 +112,29 @@ exports.sendOtp = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Phone number is required' });
     }
 
-    // Validation for Indian phone number: starts with +91 followed by 10 digits
-    const phoneRegex = /^\+91\d{10}$/;
+    // Validation for Indian phone number: starts with +91 followed by 10 digits (first digit must be 6, 7, 8, or 9)
+    const phoneRegex = /^\+91[6-9]\d{9}$/;
     if (!phoneRegex.test(phoneNumber)) {
       return res.status(400).json({ 
         success: false, 
-        message: 'Invalid phone number format. Must start with +91 followed by a 10-digit number.' 
+        message: 'Invalid phone number format. Must start with +91 followed by a 10-digit Indian mobile number starting with 6, 7, 8, or 9.' 
+      });
+    }
+
+    const phoneDigits = phoneNumber.slice(3);
+    // Block repeating dummy numbers (e.g. 9999999999)
+    if (/^(\d)\1{9}$/.test(phoneDigits)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid phone number. Dummy repeating numbers are not allowed.'
+      });
+    }
+
+    // Block sequential dummy numbers (e.g. 9876543210)
+    if ('0123456789'.includes(phoneDigits) || '9876543210'.includes(phoneDigits)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid phone number. Simple sequential numbers are not allowed.'
       });
     }
 
@@ -174,11 +191,26 @@ exports.verifyOtp = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Phone number and OTP are required' });
     }
 
-    const phoneRegex = /^\+91\d{10}$/;
+    const phoneRegex = /^\+91[6-9]\d{9}$/;
     if (!phoneRegex.test(phoneNumber)) {
       return res.status(400).json({ 
         success: false, 
-        message: 'Invalid phone number format. Must start with +91 followed by a 10-digit number.' 
+        message: 'Invalid phone number format. Must start with +91 followed by a 10-digit Indian mobile number starting with 6, 7, 8, or 9.' 
+      });
+    }
+
+    const phoneDigits = phoneNumber.slice(3);
+    if (/^(\d)\1{9}$/.test(phoneDigits)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid phone number. Dummy repeating numbers are not allowed.'
+      });
+    }
+
+    if ('0123456789'.includes(phoneDigits) || '9876543210'.includes(phoneDigits)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid phone number. Simple sequential numbers are not allowed.'
       });
     }
 

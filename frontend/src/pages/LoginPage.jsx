@@ -74,8 +74,16 @@ export default function LoginPage() {
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
-    if (!/^\d{10}$/.test(rawPhone)) {
-      toast.error('Please enter a valid 10-digit mobile number.');
+    if (!/^[6-9]\d{9}$/.test(rawPhone)) {
+      toast.error('Please enter a valid 10-digit Indian mobile number starting with 6, 7, 8, or 9.');
+      return;
+    }
+    if (/^(\d)\1{9}$/.test(rawPhone)) {
+      toast.error('Dummy repeating numbers are not allowed.');
+      return;
+    }
+    if ('0123456789'.includes(rawPhone) || '9876543210'.includes(rawPhone)) {
+      toast.error('Simple sequential numbers are not allowed.');
       return;
     }
     const formattedPhone = `+91${rawPhone}`;
